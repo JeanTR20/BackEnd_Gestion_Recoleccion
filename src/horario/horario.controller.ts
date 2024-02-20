@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { HorarioService } from './horario.service';
 import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Horario')
 @Controller('horario')
 export class HorarioController {
   constructor(private readonly horarioService: HorarioService) {}
@@ -11,6 +13,8 @@ export class HorarioController {
   listarhorario(@Param('dia') dia:string){
     return this.horarioService.listarHorario(dia)
   }
+
+  
   // @Post()
   // create(@Body() createHorarioDto: CreateHorarioDto) {
   //   return this.horarioService.create(createHorarioDto);

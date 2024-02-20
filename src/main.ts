@@ -19,7 +19,7 @@ async function bootstrap() {
   //Configuracion de Swagger
   const config = new DocumentBuilder()
     .setTitle('Gestion de recoleccion de basura')
-    .setDescription('Aqui los api listado.')
+    .setDescription('Aqui el listado de las apis')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
