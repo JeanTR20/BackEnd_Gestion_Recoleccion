@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
+import { HorarioModule } from './horario/horario.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: false,
     }),
+    HorarioModule,
     //poner todos los modulos del la carpeta creada
   ],
   controllers: [],
