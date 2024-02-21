@@ -4,6 +4,7 @@ import { UpdateHorarioDto } from './dto/update-horario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Horario } from './entities/horario.entity';
 import { Repository } from 'typeorm';
+import { DataListarHorarioDto } from './dto/data-listar-horario.dto';
 
 @Injectable()
 export class HorarioService {
@@ -13,11 +14,11 @@ export class HorarioService {
     private horarioRepository: Repository<Horario>,
   ){}
 
-  async listarHorario(dia:string){
+  async listarHorario( {ruta, dia}: DataListarHorarioDto){
     try {
       const [horario] = await this.horarioRepository.query(
-        'call sp_listar_horario(?)', 
-        [dia]
+        'call sp_listar_horario(?,?)', 
+        [ruta, dia]
       );
       return horario;
     } catch (error) {

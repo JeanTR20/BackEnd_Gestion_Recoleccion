@@ -1,17 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { HorarioService } from './horario.service';
 import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { DataListarHorarioDto } from './dto/data-listar-horario.dto';
 
 @ApiTags('Horario')
 @Controller('horario')
 export class HorarioController {
   constructor(private readonly horarioService: HorarioService) {}
 
-  @Get(':dia')
-  listarhorario(@Param('dia') dia:string){
-    return this.horarioService.listarHorario(dia)
+  @Get('')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Listar horario',
+    description:
+      'Esta API permite mostrar una lista de los horario de recoleccion y las referencia de los puntos de recoleccion mediante los parametros:{"ruta":"NumberString"(1 -> ruta 1, 2 -> ruta 2), "dia":"string"}. SP: sp_listar_horario(?,?)',
+  })
+  listarhorario(
+    @Query() dataListarHorarioDto: DataListarHorarioDto
+    ){
+    return this.horarioService.listarHorario(dataListarHorarioDto)
   }
 
   
