@@ -22,9 +22,9 @@ export class AuthController {
       'Esta API obtiene los datos del usuario despues del login, mediante los parametros:{"correo": "string", contrasena: "string"}, SP: sp_iniciar_sesion(?,?)',
   })
   login(
-    @Query() loginAuthDto: LoginAuthDto
+    @Body() loginAuthDto: LoginAuthDto
   ){
-    return this.authService.iniciarSesion(loginAuthDto)
+    return this.authService.login(loginAuthDto)
   }
 
   // @Post()

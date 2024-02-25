@@ -18,7 +18,7 @@ export class AuthService {
     private readonly authRepository: Repository<Auth>
   ){}
 
-  async iniciarSesion({correo_usuario, contrasena}: LoginAuthDto){
+  async login({correo_usuario, contrasena}: LoginAuthDto){
     try {
 
       await this.authRepository.query(
