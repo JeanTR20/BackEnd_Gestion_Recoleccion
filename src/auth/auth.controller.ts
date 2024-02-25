@@ -11,7 +11,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
 
-  @Get()
+  @Post('login')
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
@@ -19,7 +19,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Validacion de los datos para Login',
     description:
-      'Esta API obtiene los datos del usuario despues del login, mediante los parametros:{"correo": "string", contrasena: "string"}, SP: sp_iniciar_sesion(?b,?)',
+      'Esta API obtiene los datos del usuario despues del login, mediante los parametros:{"correo": "string", contrasena: "string"}, SP: sp_iniciar_sesion(?,?)',
   })
   login(
     @Query() loginAuthDto: LoginAuthDto
