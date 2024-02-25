@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { HorarioModule } from './horario/horario.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { HorarioModule } from './horario/horario.module';
       synchronize: false,
     }),
     HorarioModule,
+    AuthModule,
     //poner todos los modulos del la carpeta creada
   ],
   controllers: [],
