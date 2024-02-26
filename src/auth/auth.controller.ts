@@ -4,6 +4,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -17,7 +18,7 @@ export class AuthController {
     description: 'Contra de API',
   })
   @ApiOperation({
-    summary: 'Validacion de los datos para Login',
+    summary: 'Login',
     description:
       'Esta API obtiene los datos del usuario despues del login, mediante los parametros:{"correo": "string", contrasena: "string"}, SP: sp_iniciar_sesion(?,?)',
   })
@@ -27,6 +28,22 @@ export class AuthController {
     return this.authService.login(loginAuthDto)
   }
 
+
+  @Post('register')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Crear usuario Residente',
+    description:
+      'Esta API permite crear el usuario del residente, mediante los parametros:{"nombre_usuario": "string", "correo": "string", contrasena: "string"}, SP: sp_registrar_usuario_residente(?,?,?)',
+  })
+  crearusuario(
+    @Body() createuserAuthDto: CreateUserAuhtDto
+  ){
+    return this.authService.crearUsuario(createuserAuthDto)
+  }
   // @Post()
   // create(@Body() createAuthDto: CreateAuthDto) {
   //   return this.authService.create(createAuthDto);

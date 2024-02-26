@@ -1,16 +1,19 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Auth } from './entities/auth.entity';
 import { Repository } from 'typeorm';
+import * as bcryptjs from 'bcryptjs';
 import { Horario } from '../horario/entities/horario.entity';
-import { isEmail } from 'class-validator';
+import { isEmail, Length } from 'class-validator';
 import { log } from 'util';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
+
 
 @Injectable()
-export class AuthService {
+export class AuthService {  
   
   constructor(
     // private readonly jwtService: JwtService,
@@ -21,16 +24,39 @@ export class AuthService {
   async login({correo_usuario, contrasena}: LoginAuthDto){
     try {
 
-      await this.authRepository.query(
-        'call sp_iniciar_sesion(?,?,@nombre_rol)',
-        [correo_usuario, contrasena]
+      const [usuario] = await this.authRepository.query(
+        'SELECT usuario_contrasena, usuario_nombre_usuario, usuario_correo FROM tbl_usuario WHERE usuario_correo = ? OR usuario_nombre_usuario = ?',
+        [correo_usuario, correo_usuario]
       );
 
-      const [login] = await this.authRepository.query(
-        'select @nombre_rol as nombre_rol'
-      );
+      if(!usuario){
+        throw new UnauthorizedException('No es valido el correo o el nombre de usuario')
+      }
 
-      return login;
+      const passHash = usuario.usuario_contrasena;
+
+      //verifica si la contrasena es correcta
+
+      const isValidPassHash = await bcryptjs.compare(contrasena, passHash)
+
+      if(isValidPassHash){
+        await this.authRepository.query(
+          'call sp_iniciar_sesion(?,?,@nombre_rol)',
+          [correo_usuario, passHash]
+        );
+  
+        const [login] = await this.authRepository.query(
+          'select @nombre_rol as nombre_rol'
+        );
+  
+        return {
+          nombre_rol: login.nombre_rol,
+          nombre_usuario: usuario.usuario_nombre_usuario,
+          usuario_correo: usuario.usuario_correo
+        }
+      }else{
+        throw new UnauthorizedException('No es valido la contrasena');
+      }
 
     } catch (error) {
 
@@ -41,8 +67,51 @@ export class AuthService {
       } else if (error.name === 'ErrorDeEjecución') {
         throw new InternalServerErrorException('Error al ejecutar la operación en la base de datos');
       } else {
-        throw new InternalServerErrorException('Ocurrió un error desconocido');
+        throw new InternalServerErrorException(error.message);
       }
+    }
+  }
+
+  async crearUsuario(createUserAuhtDto: CreateUserAuhtDto){
+    try {
+
+      const {correo, nombre_usuario} = createUserAuhtDto;
+
+      const validarCorreoUsuario = await this.authRepository.query(
+        'SELECT usuario_correo, usuario_nombre_usuario FROM tbl_usuario WHERE usuario_correo = ? OR usuario_nombre_usuario = ?',
+        [correo, nombre_usuario]
+      )
+      
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo && usuario.usuario_nombre_usuario === nombre_usuario )){
+        throw new BadRequestException('El correo y el nombre de usuario ya existe')
+      }
+
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_nombre_usuario === nombre_usuario )){
+        throw new BadRequestException('El nombre de usuario ya existe')
+      }
+
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
+        throw new BadRequestException('El correo ya existe')
+      }
+
+      const passHashed = await bcryptjs.hash(createUserAuhtDto.contrasena, 10);
+
+      await this.authRepository.query(
+        'call sp_registrar_usuario_residente(?,?,?,@id_usuario)', [
+          createUserAuhtDto.nombre_usuario,
+          createUserAuhtDto.correo,
+          passHashed,
+        ]
+      );
+  
+      const [id_usuario] = await this.authRepository.query(
+        'SELECT @id_usuario as id_usuario'
+      );
+  
+      return id_usuario;
+
+    } catch (error) {
+      throw new InternalServerErrorException('Error al registrar el usuario, ' + error.message)
     }
   }
 
