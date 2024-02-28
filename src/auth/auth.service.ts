@@ -25,7 +25,7 @@ export class AuthService {
     try {
 
       const [usuario] = await this.authRepository.query(
-        'SELECT usuario_contrasena, usuario_nombre_usuario, usuario_correo FROM tbl_usuario WHERE usuario_correo = ? OR usuario_nombre_usuario = ?',
+        'SELECT usuario_contrasena, usuario_nombre_usuario, usuario_correo, usuario_estado FROM tbl_usuario WHERE usuario_correo = ? OR usuario_nombre_usuario = ?',
         [correo_usuario, correo_usuario]
       );
 
@@ -50,9 +50,10 @@ export class AuthService {
         );
   
         return {
-          nombre_rol: login.nombre_rol,
           nombre_usuario: usuario.usuario_nombre_usuario,
-          usuario_correo: usuario.usuario_correo
+          usuario_correo: usuario.usuario_correo,
+          usuario_estado: usuario.usuario_estado,
+          nombre_rol: login.nombre_rol
         }
       }else{
         throw new UnauthorizedException('No es valido la contrasena');
