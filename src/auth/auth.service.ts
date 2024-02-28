@@ -10,13 +10,14 @@ import { isEmail, Length } from 'class-validator';
 import { log } from 'util';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
 export class AuthService {  
   
   constructor(
-    // private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService,
     @InjectRepository(Auth) 
     private readonly authRepository: Repository<Auth>
   ){}
@@ -45,6 +46,12 @@ export class AuthService {
           [correo_usuario, passHash]
         );
   
+        const payload = { 
+          id_residente: usuario.usuario_id, 
+        };
+
+        const token = await this.jwtService.signAsync(payload);
+        
         const [login] = await this.authRepository.query(
           'select @nombre_rol as nombre_rol'
         );
@@ -56,7 +63,8 @@ export class AuthService {
             usuario_correo: usuario.usuario_correo,
             usuario_estado: usuario.usuario_estado,
             nombre_rol: login.nombre_rol
-          }
+          },
+          token: token
         }
       }else{
         throw new UnauthorizedException('No es valido la contrasena');

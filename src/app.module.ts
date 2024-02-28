@@ -5,12 +5,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // import { AppService } from './app.service';
 import { HorarioModule } from './horario/horario.module';
 import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SEED,
+      signOptions: { expiresIn: '6h' },
+    }),
+    
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
@@ -22,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
       synchronize: false,
     }),
     HorarioModule,
+    
     AuthModule,
     //poner todos los modulos del la carpeta creada
   ],
