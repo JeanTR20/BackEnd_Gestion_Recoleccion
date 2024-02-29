@@ -105,11 +105,14 @@ export class AuthService {
       
     );
     return {
-      usuario_id: datos[0].usuario_id,
-      usuario_nombre: datos[0].usuario_nombre_usuario,
-      usuario_correo: datos[0].usuario_correo,
-      usuario_estado: datos[0].usuario_estado,
-      rol_nombre: datos[0].rol_nombre
+      user: {
+        usuario_id: datos[0].usuario_id,
+        usuario_nombre: datos[0].usuario_nombre_usuario,
+        usuario_correo: datos[0].usuario_correo,
+        usuario_estado: datos[0].usuario_estado,
+        rol_nombre: datos[0].rol_nombre
+      },
+      token: token
     }
   }
 
