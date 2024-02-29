@@ -28,6 +28,21 @@ export class AuthController {
     return this.authService.login(loginAuthDto)
   }
 
+  @Get(':token')
+
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  
+  @ApiOperation({
+    summary: 'Validar login',
+    description:
+      'Esta API obtiene los datos del usuario despues del login, mediante los parametros:{"correo": "string", contrasena: "string"}, SP: sp_iniciar_sesion(?,?)',
+  })
+  obtenerdatos(@Param('token') token: string){
+    return this.authService.obtenerDatos(token)
+  }
 
   @Post('register')
   @ApiHeader({

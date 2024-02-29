@@ -11,6 +11,7 @@ import { log } from 'util';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
 import { JwtService } from '@nestjs/jwt';
+import { throwError } from 'rxjs';
 
 
 @Injectable()
@@ -81,6 +82,34 @@ export class AuthService {
       } else {
         throw new InternalServerErrorException(error.message);
       }
+    }
+  }
+
+  async obtenerTokenResidente(token: string): Promise<number>{
+    try {
+      const decoded = await this.jwtService.verifyAsync(token);
+      const residente_id  = decoded.id_residente;
+      
+      return residente_id;
+
+    } catch (error) {
+      throw new UnauthorizedException('token no valido')
+    }
+  }
+
+  async obtenerDatos(token: string){
+
+    const idtoken = await this.obtenerTokenResidente(token)
+    const [datos] = await this.authRepository.query(
+      'CALL sp_validar_login(?)', [idtoken]
+      
+    );
+    return {
+      usuario_id: datos[0].usuario_id,
+      usuario_nombre: datos[0].usuario_nombre_usuario,
+      usuario_correo: datos[0].usuario_correo,
+      usuario_estado: datos[0].usuario_estado,
+      rol_nombre: datos[0].rol_nombre
     }
   }
 
