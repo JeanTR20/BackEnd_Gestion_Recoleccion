@@ -38,7 +38,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Validar login',
     description:
-      'Esta API obtiene los datos del usuario despues del login, mediante los parametros:{"correo": "string", contrasena: "string"}, SP: sp_iniciar_sesion(?,?)',
+      'Esta API obtiene los datos del usuario, mediante los parametros:{"token": "string"}, SP: call sp_validar_login(?)',
   })
   obtenerdatos(@Param('token') token: string){
     return this.authService.obtenerDatos(token)
