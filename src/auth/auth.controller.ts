@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request,Patch, Param, Delete, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -28,8 +28,7 @@ export class AuthController {
     return this.authService.login(loginAuthDto)
   }
 
-  @Get(':token')
-
+  @Get('validar-token/:token')
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
@@ -40,7 +39,7 @@ export class AuthController {
     description:
       'Esta API obtiene los datos del usuario, mediante los parametros:{"token": "string"}, SP: call sp_validar_login(?)',
   })
-  obtenerdatos(@Param('token') token: string){
+  obtenerdatos(@Param('token') token: string) {
     return this.authService.obtenerDatos(token)
   }
 
