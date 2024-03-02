@@ -42,8 +42,8 @@ export class AuthService {
       const isValidPassHash = await bcryptjs.compare(contrasena, passHash)
 
       if(isValidPassHash){
-        await this.authRepository.query(
-          'call sp_iniciar_sesion(?,?,@nombre_rol)',
+        const [user] = await this.authRepository.query(
+          'call sp_iniciar_sesion(?,?)',
           [correo_usuario, passHash]
         );
   
@@ -52,18 +52,14 @@ export class AuthService {
         };
 
         const token = await this.jwtService.signAsync(payload);
-        
-        const [login] = await this.authRepository.query(
-          'select @nombre_rol as nombre_rol'
-        );
-  
+    
         return {
           user: {
             usuario_id: usuario.usuario_id,
             usuario_nombre: usuario.usuario_nombre_usuario,
             usuario_correo: usuario.usuario_correo,
             usuario_estado: usuario.usuario_estado,
-            nombre_rol: login.nombre_rol
+            rol_nombre: user[0].rol_nombre
           },
           token: token
         }
