@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HorarioModule } from './horario/horario.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -29,6 +30,21 @@ import { JwtModule } from '@nestjs/jwt';
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
       synchronize: false,
+    }),
+
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'jeantorresricse@gmail.com',
+          pass: 'oxdy dqjc hlxh wnuz'
+        }
+      },
+      defaults: {
+        from: '"Muncipalidad Distrital de Huancán" <jeantorresricse@gmail.com>',
+      },
     }),
     HorarioModule,
     

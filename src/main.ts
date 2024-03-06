@@ -6,6 +6,7 @@ import * as csurf from 'csurf'
 import fastifyCsrf from '@fastify/csrf-protection'
 
 async function bootstrap() {
+  
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api/v1');

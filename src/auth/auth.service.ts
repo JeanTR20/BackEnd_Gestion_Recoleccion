@@ -1,18 +1,16 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, Body } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Auth } from './entities/auth.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
-import { Horario } from '../horario/entities/horario.entity';
-import { isEmail, Length } from 'class-validator';
-import { log } from 'util';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
 import { JwtService } from '@nestjs/jwt';
-import { throwError } from 'rxjs';
-
+import { RecoverAuthDto } from './dto/recover-auth.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { emitWarning } from 'process';
 
 @Injectable()
 export class AuthService {  
@@ -20,7 +18,8 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     @InjectRepository(Auth) 
-    private readonly authRepository: Repository<Auth>
+    private readonly authRepository: Repository<Auth>,
+    private readonly mailerService: MailerService
   ){}
 
   async login({correo_usuario, contrasena}: LoginAuthDto){
@@ -48,7 +47,7 @@ export class AuthService {
         );
   
         const payload = { 
-          id_residente: usuario.usuario_id, 
+          id_usuario: usuario.usuario_id,
         };
 
         const token = await this.jwtService.signAsync(payload);
@@ -81,12 +80,24 @@ export class AuthService {
     }
   }
 
-  async obtenerTokenResidente(token: string): Promise<number>{
+  // async obtenerTokenResidente(token: string): Promise<number>{
+  //   try {
+  //     const decoded = await this.jwtService.verifyAsync(token);
+  //     const residente_id  = decoded.id_residente;
+      
+  //     return residente_id;
+
+  //   } catch (error) {
+  //     throw new UnauthorizedException('token no valido')
+  //   }
+  // }
+
+  async obtenerTokenUsuario(token: string): Promise<number>{
     try {
       const decoded = await this.jwtService.verifyAsync(token);
-      const residente_id  = decoded.id_residente;
+      const usuario_id  = decoded.id_usuario;
       
-      return residente_id;
+      return usuario_id;
 
     } catch (error) {
       throw new UnauthorizedException('token no valido')
@@ -95,7 +106,7 @@ export class AuthService {
 
   async obtenerDatos(token: string){
 
-    const idtoken = await this.obtenerTokenResidente(token)
+    const idtoken = await this.obtenerTokenUsuario(token)
     const [datos] = await this.authRepository.query(
       'CALL sp_validar_login(?)', [idtoken]
       
@@ -155,6 +166,51 @@ export class AuthService {
     }
   }
 
+  async envioCorreoRecover(recoverAuthDto: RecoverAuthDto){
+
+    const {correo} = recoverAuthDto
+    try {
+      const [user] = await this.authRepository.query(
+        'SELECT usuario_correo, usuario_id FROM tbl_usuario WHERE usuario_correo = ?',
+        [correo]
+      )
+      
+      if(!user){
+        throw new Error('no existe el correo');
+      }
+
+      await this.mailerService.sendMail({
+        to: correo,
+        subject: 'Restablecer contraseña',
+        text: 'Restablece tu contrasena, haga click en el boton restablecer contrasena',
+        html: ``,
+        
+      });
+
+      return { message : 'Se envió el correo correctamente'}
+
+    } catch (error) {
+      throw new InternalServerErrorException('Error al enviar, ' + error.message)
+    }
+  }
+
+  // async recuperarContrasena(token: string){
+  //   try {
+  //     const decoded = await this.jwtService.verifyAsync(token);
+  //     const usuario_id = decoded.id_usuario
+  //     console.log(decoded)
+  //     const [recuperarcontrasena] = await this.authRepository.query(
+  //       'call sp_recuperar_contrasena(?)', [usuario_id]
+  //     );
+
+  //     const passHashed = await bcryptjs.hash( recuperarcontrasena.nueva_contrasena, 10);
+   
+  //     return recuperarcontrasena;
+  //   } catch (error) {
+  //     throw new Error('Erro al recuperar contrasena')
+  //   }
+  // }
+
   // create(createAuthDto: CreateAuthDto) {
   //   return 'This action adds a new auth';
   // }
@@ -174,4 +230,6 @@ export class AuthService {
   // remove(id: number) {
   //   return `This action removes a #${id} auth`;
   // }
+
+  
 }

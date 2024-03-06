@@ -5,6 +5,8 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
+import { RecoverAuthDto } from './dto/recover-auth.dto';
+import { isString } from 'class-validator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -58,6 +60,39 @@ export class AuthController {
   ){
     return this.authService.crearUsuario(createuserAuthDto)
   }
+
+  @Post('enviar-correo')
+  @ApiHeader({
+    name: 'api-key',
+   description: 'Contra de API',
+  })
+  @ApiOperation({
+   summary: 'Envio de correo de restablecimiento de contrasena',
+    description:
+      'Esta API permite recuperar la contrasena del usuario, mediante los parametros:{"correo": "string"}, SP: sp_recuperar_contrasena(?)',
+  })
+  enviocorreorecover(
+    @Body() recoverAuthDto: RecoverAuthDto
+  ){
+    return this.authService.envioCorreoRecover(recoverAuthDto)
+  }
+
+
+  // @Post()
+  // @ApiHeader({
+  //   name: 'api-key',
+  //   description: 'Contra de API',
+  // })
+  // @ApiOperation({
+  //   summary: 'Recuperar contrasena',
+  //   description:
+  //     'Esta API permite recuperar la contrasena del usuario, mediante los parametros:{"id_usuario": "string"}, SP: sp_recuperar_contrasena(?)',
+  // })
+  // recuperarcontrasena(
+  //   @Body() recoverAuthDto: RecoverAuthDto
+  // ){
+  //   return this.authService.recuperarContrasena(recoverAuthDto.token)
+  // }
   // @Post()
   // create(@Body() createAuthDto: CreateAuthDto) {
   //   return this.authService.create(createAuthDto);

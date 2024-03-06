@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Auth } from './entities/auth.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Auth])],
+  imports: [TypeOrmModule.forFeature([Auth]), MailerModule],
   controllers: [AuthController],
   providers: [AuthService],
   exports:[AuthService, AuthModule]
