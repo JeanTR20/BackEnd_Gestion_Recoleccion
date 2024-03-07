@@ -11,6 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 import { RecoverAuthDto } from './dto/recover-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { emitWarning } from 'process';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class AuthService {  
@@ -179,14 +181,15 @@ export class AuthService {
         throw new Error('no existe el correo');
       }
 
+      const templatePath = path.join(__dirname, '..', '..', 'src', 'auth', 'correo', 'recoverCorreo.html');
+      const html = fs.readFileSync(templatePath, 'utf-8');
+
       await this.mailerService.sendMail({
         to: correo,
         subject: 'Restablecer contraseña',
-        text: 'Restablece tu contrasena, haga click en el boton restablecer contrasena',
-        html: ``,
+        html: html,
         
       });
-
       return { message : 'Se envió el correo correctamente'}
 
     } catch (error) {
