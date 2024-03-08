@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, Body } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, Body, Query, ConsoleLogger } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +13,9 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { emitWarning } from 'process';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as crypto from 'crypto';
+import { EnvioCorreoAuthDto } from './dto/envio-correo-auth.dto';
+
 
 @Injectable()
 export class AuthService {  
@@ -168,9 +171,9 @@ export class AuthService {
     }
   }
 
-  async envioCorreoRecover(recoverAuthDto: RecoverAuthDto){
+  async envioCorreoRecover(envioCorreoAuthDto: EnvioCorreoAuthDto){
 
-    const {correo} = recoverAuthDto
+    const {correo} = envioCorreoAuthDto
     try {
       const [user] = await this.authRepository.query(
         'SELECT usuario_correo, usuario_id FROM tbl_usuario WHERE usuario_correo = ?',
@@ -181,8 +184,12 @@ export class AuthService {
         throw new Error('no existe el correo');
       }
 
+      const resetToken = this.jwtService.sign({correo}, {expiresIn: '3h'});
+      const resetLink = `http://localhost:4200/usuario/restablecer-contrasena?token=${resetToken}`
+
       const templatePath = path.join(__dirname, '..', '..', 'src', 'auth', 'correo', 'recoverCorreo.html');
-      const html = fs.readFileSync(templatePath, 'utf-8');
+      let html = fs.readFileSync(templatePath, 'utf-8');
+      html = html.replace('{{resetLink}}', resetLink)
 
       await this.mailerService.sendMail({
         to: correo,
@@ -197,22 +204,33 @@ export class AuthService {
     }
   }
 
-  // async recuperarContrasena(token: string){
-  //   try {
-  //     const decoded = await this.jwtService.verifyAsync(token);
-  //     const usuario_id = decoded.id_usuario
-  //     console.log(decoded)
-  //     const [recuperarcontrasena] = await this.authRepository.query(
-  //       'call sp_recuperar_contrasena(?)', [usuario_id]
-  //     );
-
-  //     const passHashed = await bcryptjs.hash( recuperarcontrasena.nueva_contrasena, 10);
-   
-  //     return recuperarcontrasena;
-  //   } catch (error) {
-  //     throw new Error('Erro al recuperar contrasena')
-  //   }
+  // async saveResetToken(email: string, resetToken: string): Promise<void> {
+  //   const query = 'UPDATE users SET reset_token = ? WHERE email = ?';
+  //   await this.authRepository.query(query, [resetToken, email]);
   // }
+
+  async recoverPassword(recoverAuthDto: RecoverAuthDto){
+    try {
+
+      const {token, nuevo_password} = recoverAuthDto;
+
+      const decoded = this.jwtService.verify(token);
+      const correo = decoded.correo;
+      console.log(decoded)
+      
+      const nuevo_passHashed = await bcryptjs.hash(nuevo_password, 10);
+
+      await this.authRepository.query(
+        'UPDATE tbl_usuario SET usuario_contrasena = ? WHERE usuario_correo = ?', 
+        [nuevo_passHashed, correo]
+      );
+   
+      return {message: 'Nueva contraseña actualizada correctanente'}
+    } catch (error) {
+      throw new UnauthorizedException('Token invalido o expirado')
+    }
+  }
+  
 
   // create(createAuthDto: CreateAuthDto) {
   //   return 'This action adds a new auth';

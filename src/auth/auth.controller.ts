@@ -7,6 +7,7 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
 import { RecoverAuthDto } from './dto/recover-auth.dto';
 import { isString } from 'class-validator';
+import { EnvioCorreoAuthDto } from './dto/envio-correo-auth.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -72,11 +73,24 @@ export class AuthController {
       'Esta API permite recuperar la contrasena del usuario, mediante los parametros:{"correo": "string"}, SP: sp_recuperar_contrasena(?)',
   })
   enviocorreorecover(
-    @Body() recoverAuthDto: RecoverAuthDto
+    @Body() envioCorreoAuthDto: EnvioCorreoAuthDto
   ){
-    return this.authService.envioCorreoRecover(recoverAuthDto)
+    return this.authService.envioCorreoRecover(envioCorreoAuthDto)
   }
 
+  @Post('actualizar-password')
+  @ApiHeader({
+    name: 'api-key',
+   description: 'Contra de API',
+  })
+  @ApiOperation({
+   summary: 'actualizar nueva de contrasena',
+    description:
+      'Esta API permite acualizar la contrasena del usuario, mediante los query:{"token":"string""correo": "string"}',
+  })
+  recoverpassword(@Body() recoverAuthDto: RecoverAuthDto){
+    return this.authService.recoverPassword(recoverAuthDto)
+  }
 
   // @Post()
   // @ApiHeader({
