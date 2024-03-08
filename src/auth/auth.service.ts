@@ -190,7 +190,7 @@ export class AuthService {
         html: html,
         
       });
-      return { message : 'Se envió el correo correctamente'}
+      return { message : 'Se envió el mensaje de correo correctamente'}
 
     } catch (error) {
       throw new InternalServerErrorException('Error al enviar, ' + error.message)
