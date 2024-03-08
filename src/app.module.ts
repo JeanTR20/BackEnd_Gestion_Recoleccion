@@ -7,6 +7,7 @@ import { HorarioModule } from './horario/horario.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule, MailerService } from '@nestjs-modules/mailer';
+import { UsuarioModule } from './usuario/usuario.module';
 
 @Module({
   imports: [
@@ -49,6 +50,8 @@ import { MailerModule, MailerService } from '@nestjs-modules/mailer';
     HorarioModule,
     
     AuthModule,
+    
+    UsuarioModule,
     //poner todos los modulos del la carpeta creada
   ],
   controllers: [],

@@ -39,7 +39,7 @@ $ npm run start:dev
 ## Creación de entidades
 
 ```bash
-$ nest g res usuario --no--spec
+$ nest g res usuario --no-spec
 ```
 ## Running the app
 
