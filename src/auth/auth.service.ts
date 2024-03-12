@@ -216,7 +216,6 @@ export class AuthService {
 
       const decoded = this.jwtService.verify(token);
       const correo = decoded.correo;
-      console.log(decoded)
       
       const nuevo_passHashed = await bcryptjs.hash(nuevo_password, 10);
 

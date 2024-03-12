@@ -22,7 +22,7 @@ export class HorarioService {
       );
       return horario;
     } catch (error) {
-      throw new Error('Error al listar horario')
+      throw new Error('Error al listar horario, ' + error.message)
     }
   }
 
