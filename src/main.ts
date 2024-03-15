@@ -24,10 +24,15 @@ async function bootstrap() {
     .setTitle('Gestion de recoleccion de basura')
     .setDescription('Aqui el listado de las apis')
     .setVersion('1.0')
+    .addBearerAuth( // Esto añade el esquema de seguridad JWT
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'access-token')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-  app.enableCors();
+  app.enableCors({
+    // allowedHeaders: ['Authorization', 'Content-Type']
+  });
   // app.use(csurf());
 
   // await app.register(fastifyCsrf);

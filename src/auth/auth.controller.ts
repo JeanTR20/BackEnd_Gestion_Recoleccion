@@ -1,13 +1,16 @@
-import { Controller, Get, Post, Body, Request,Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request,Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
-import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
 import { RecoverAuthDto } from './dto/recover-auth.dto';
 import { isString } from 'class-validator';
 import { EnvioCorreoAuthDto } from './dto/envio-correo-auth.dto';
+import { AuthGuard } from './guard/auth.guard';
+import { Roles } from './decorators/roles.decorator';
+import { RolesGuard } from './guard/roles.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -16,6 +19,9 @@ export class AuthController {
 
 
   @Post('login')
+  // @UseGuards()
+  // @Roles(['Administrador', 'Recolector', 'Residente'])
+  @ApiBearerAuth('acces-token')
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
@@ -31,6 +37,11 @@ export class AuthController {
     return this.authService.login(loginAuthDto)
   }
 
+  // @Get('profile')
+  // profile(@Request() req) {
+  // return req.user;
+  // }
+  
   @Get('validar-token/:token')
   @ApiHeader({
     name: 'api-key',
@@ -38,7 +49,7 @@ export class AuthController {
   })
   
   @ApiOperation({
-    summary: 'Validar login',
+    summary: 'Validar token',
     description:
       'Esta API obtiene los datos del usuario, mediante los parametros:{"token": "string"}, SP: call sp_validar_login(?)',
   })
@@ -62,7 +73,24 @@ export class AuthController {
     return this.authService.crearUsuario(createuserAuthDto)
   }
 
+  @Get('validar-token-correo/:token')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  
+  @ApiOperation({
+    summary: 'Validar token de correo',
+    description:
+      'Esta API permite validar si el token de correo es valido o expirado',
+  })
+  validarCorreo(@Param('token') token: string) {
+    return this.authService.validadarTokenCorreo(token)
+  }
+
+
   @Post('enviar-correo')
+  
   @ApiHeader({
     name: 'api-key',
    description: 'Contra de API',

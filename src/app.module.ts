@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 import { UsuarioModule } from './usuario/usuario.module';
 import { ReporteIncidenciaModule } from './reporte_incidencia/reporte_incidencia.module';
+import { PassportModule } from '@nestjs/passport';
 
 
 @Module({
@@ -56,6 +57,7 @@ import { ReporteIncidenciaModule } from './reporte_incidencia/reporte_incidencia
     UsuarioModule,
     
     ReporteIncidenciaModule,
+    PassportModule
     //poner todos los modulos del la carpeta creada
   ],
   controllers: [],

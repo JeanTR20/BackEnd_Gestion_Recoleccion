@@ -31,7 +31,7 @@ export class AuthService {
     try {
 
       const [usuario] = await this.authRepository.query(
-        'SELECT usuario_contrasena, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_correo = ? OR usuario_nombre_usuario = ?',
+        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_correo = ? OR usuario_nombre_usuario = ?',
         [correo_usuario, correo_usuario]
       );
 
@@ -53,6 +53,7 @@ export class AuthService {
   
         const payload = { 
           id_usuario: usuario.usuario_id,
+          rol_nombre: user[0].rol_nombre
         };
 
         const token = await this.jwtService.signAsync(payload);
@@ -60,6 +61,9 @@ export class AuthService {
         return {
           user: {
             usuario_id: usuario.usuario_id,
+            usuario_nombre_completo: usuario.usuario_nombre_completo,
+            usuario_apellido_paterno: usuario.usuario_apellido_paterno,
+            usuario_apellido_materno: usuario.usuario_apellido_materno,
             usuario_nombre: usuario.usuario_nombre_usuario,
             usuario_correo: usuario.usuario_correo,
             usuario_estado: usuario.usuario_estado,
@@ -204,10 +208,19 @@ export class AuthService {
     }
   }
 
-  // async saveResetToken(email: string, resetToken: string): Promise<void> {
-  //   const query = 'UPDATE users SET reset_token = ? WHERE email = ?';
-  //   await this.authRepository.query(query, [resetToken, email]);
-  // }
+  async validadarTokenCorreo(token: string){
+    try {
+      const decoded = await this.jwtService.verifyAsync(token);
+      console.log(decoded)
+      return {
+        valido: true, 
+        correo: decoded.correo
+      };
+
+    } catch (error) {
+      throw new UnauthorizedException('token no valido o expirado')
+    }
+  }
 
   async recoverPassword(recoverAuthDto: RecoverAuthDto){
     try {
