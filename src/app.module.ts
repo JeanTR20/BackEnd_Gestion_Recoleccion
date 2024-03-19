@@ -11,6 +11,7 @@ import { UsuarioModule } from './usuario/usuario.module';
 import { ReporteIncidenciaModule } from './reporte_incidencia/reporte_incidencia.module';
 import { PassportModule } from '@nestjs/passport';
 import { AdminHorarioModule } from './admin_horario/admin_horario.module';
+import { AdminPersonalModule } from './admin_personal/admin_personal.module';
 
 
 @Module({
@@ -59,7 +60,8 @@ import { AdminHorarioModule } from './admin_horario/admin_horario.module';
     
     ReporteIncidenciaModule,
     PassportModule,
-    AdminHorarioModule
+    AdminHorarioModule,
+    AdminPersonalModule
     //poner todos los modulos del la carpeta creada
   ],
   controllers: [],
