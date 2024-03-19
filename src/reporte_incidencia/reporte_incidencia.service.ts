@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ReporteIncidencia } from './entities/reporte_incidencia.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
+import { ListarIncidenciaDto } from './dto/listar-incidencia.dto';
 
 @Injectable()
 export class ReporteIncidenciaService {
@@ -33,8 +34,22 @@ export class ReporteIncidenciaService {
     }
   }
 
-  listarInicdencia(){
-    
+
+  
+  // api para administrador
+
+  async listarInicdencia(listarIncidenciaDto: ListarIncidenciaDto){
+    try {
+      const {direccion, fecha_reporte} = listarIncidenciaDto;
+      const [incidencia] = await this.reporteIncidenciaRepository.query(
+        'call sp_admin_listar_reporte_incidencia(?,?)', 
+        [direccion, fecha_reporte]
+      );
+
+      return incidencia;
+    } catch (error) {
+      throw new BadRequestException('Error al listar', error.message)
+    }
   }
 
   // create(createReporteIncidenciaDto: CreateReporteIncidenciaDto) {
