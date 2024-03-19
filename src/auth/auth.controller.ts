@@ -36,11 +36,6 @@ export class AuthController {
   ){
     return this.authService.login(loginAuthDto)
   }
-
-  // @Get('profile')
-  // profile(@Request() req) {
-  // return req.user;
-  // }
   
   @Get('validar-token/:token')
   @ApiHeader({

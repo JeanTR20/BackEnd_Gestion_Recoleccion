@@ -88,19 +88,7 @@ export class AuthService {
       }
     }
   }
-
-  // async obtenerTokenResidente(token: string): Promise<number>{
-  //   try {
-  //     const decoded = await this.jwtService.verifyAsync(token);
-  //     const residente_id  = decoded.id_residente;
-      
-  //     return residente_id;
-
-  //   } catch (error) {
-  //     throw new UnauthorizedException('token no valido')
-  //   }
-  // }
-
+  
   async obtenerTokenUsuario(token: string): Promise<number>{
     try {
       const decoded = await this.jwtService.verifyAsync(token);
@@ -120,6 +108,7 @@ export class AuthService {
       'CALL sp_validar_login(?)', [idtoken]
       
     );
+    console.log(datos)
     return {
       user: {
         usuario_id: datos[0].usuario_id,

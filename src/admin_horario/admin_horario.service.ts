@@ -1,0 +1,46 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateAdminHorarioDto } from './dto/create-admin_horario.dto';
+import { UpdateAdminHorarioDto } from './dto/update-admin_horario.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AdminHorario } from './entities/admin_horario.entity';
+import { Repository } from 'typeorm';
+
+@Injectable()
+export class AdminHorarioService {
+
+  constructor(
+    @InjectRepository(AdminHorario) 
+    private readonly adminHorarioRepository: Repository<AdminHorario> 
+  ){}
+
+  // async listarhorario(){
+  //   try {
+  //     const [horario] = await this.adminHorarioRepository.query(
+  //       'call sp_admin_listar_horario()'
+  //     );
+  //     return horario;
+  //   } catch (error) {
+  //     throw new BadRequestException('Error al listar, ' + error.message)
+  //   }
+  // }
+
+  // create(createAdminHorarioDto: CreateAdminHorarioDto) {
+  //   return 'This action adds a new adminHorario';
+  // }
+
+  // findAll() {
+  //   return `This action returns all adminHorario`;
+  // }
+
+  // findOne(id: number) {
+  //   return `This action returns a #${id} adminHorario`;
+  // }
+
+  // update(id: number, updateAdminHorarioDto: UpdateAdminHorarioDto) {
+  //   return `This action updates a #${id} adminHorario`;
+  // }
+
+  // remove(id: number) {
+  //   return `This action removes a #${id} adminHorario`;
+  // }
+}
