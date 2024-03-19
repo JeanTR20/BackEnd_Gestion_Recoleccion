@@ -14,6 +14,7 @@ export class ReporteIncidenciaController {
     @Body() createReporteIncidenciaDto: CreateReporteIncidenciaDto){
     return this.reporteIncidenciaService.registrarReporteIncidencia(createReporteIncidenciaDto)
   }
+  
   // @Post()
   // create(@Body() createReporteIncidenciaDto: CreateReporteIncidenciaDto) {
   //   return this.reporteIncidenciaService.create(createReporteIncidenciaDto);

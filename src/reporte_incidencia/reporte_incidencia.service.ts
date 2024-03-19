@@ -32,6 +32,11 @@ export class ReporteIncidenciaService {
       throw new BadRequestException('Erro al registrar, ' + error.message)
     }
   }
+
+  listarInicdencia(){
+    
+  }
+
   // create(createReporteIncidenciaDto: CreateReporteIncidenciaDto) {
   //   return 'This action adds a new reporteIncidencia';
   // }
