@@ -7,28 +7,28 @@ import { UpdateAdminPersonalDto } from './dto/update-admin_personal.dto';
 export class AdminPersonalController {
   constructor(private readonly adminPersonalService: AdminPersonalService) {}
 
-  @Post()
-  create(@Body() createAdminPersonalDto: CreateAdminPersonalDto) {
-    return this.adminPersonalService.create(createAdminPersonalDto);
-  }
+  // @Post()
+  // create(@Body() createAdminPersonalDto: CreateAdminPersonalDto) {
+  //   return this.adminPersonalService.create(createAdminPersonalDto);
+  // }
 
-  @Get()
-  findAll() {
-    return this.adminPersonalService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.adminPersonalService.findAll();
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminPersonalService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.adminPersonalService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminPersonalDto: UpdateAdminPersonalDto) {
-    return this.adminPersonalService.update(+id, updateAdminPersonalDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateAdminPersonalDto: UpdateAdminPersonalDto) {
+  //   return this.adminPersonalService.update(+id, updateAdminPersonalDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminPersonalService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.adminPersonalService.remove(+id);
+  // }
 }
