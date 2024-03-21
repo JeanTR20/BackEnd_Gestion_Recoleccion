@@ -4,7 +4,7 @@ import { CreateReporteIncidenciaDto } from './dto/create-reporte_incidencia.dto'
 import { UpdateReporteIncidenciaDto } from './dto/update-reporte_incidencia.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { query } from 'express';
-import { ListarIncidenciaDto } from './dto/listar-incidencia.dto';
+import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
 
 @ApiTags('Reporte-incidencia')
 @Controller('reporte-incidencia')
@@ -41,7 +41,7 @@ export class ReporteIncidenciaController {
   listarincidencia(
     @Query() listarIncidenciaDto: ListarIncidenciaDto
   ){
-    return this.reporteIncidenciaService.listarInicdencia(listarIncidenciaDto)
+    return this.reporteIncidenciaService.listarIncidencia(listarIncidenciaDto)
   }
 
   // @Post()

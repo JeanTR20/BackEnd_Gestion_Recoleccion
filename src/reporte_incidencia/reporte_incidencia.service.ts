@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ReporteIncidencia } from './entities/reporte_incidencia.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
-import { ListarIncidenciaDto } from './dto/listar-incidencia.dto';
+import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
 
 @Injectable()
 export class ReporteIncidenciaService {
@@ -38,12 +38,12 @@ export class ReporteIncidenciaService {
   
   // api para administrador
 
-  async listarInicdencia(listarIncidenciaDto: ListarIncidenciaDto){
+  async listarIncidencia(listarIncidenciaDto: ListarIncidenciaDto){
     try {
-      const {direccion, fecha_reporte} = listarIncidenciaDto;
+      const {id_rol, direccion, fecha_reporte} = listarIncidenciaDto;
       const [incidencia] = await this.reporteIncidenciaRepository.query(
-        'call sp_admin_listar_reporte_incidencia(?,?)', 
-        [direccion, fecha_reporte]
+        'call sp_admin_listar_reporte_incidencia(?,?,?)', 
+        [id_rol, direccion, fecha_reporte]
       );
 
       return incidencia;
