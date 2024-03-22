@@ -17,11 +17,11 @@ export class AdminPersonalService {
 
   async listarRecolector( listarAdminPersonal:ListarAdminPersonal){
     try {
-      const {numero_carnet, apellidos_nombres} = listarAdminPersonal;
+      const {numero_carnet, apellidos_nombres, estado} = listarAdminPersonal;
 
       const [recolector] = await this.adminPersonalRepository.query(
-        'call sp_admin_listar_recolector(?,?)',
-        [numero_carnet, apellidos_nombres]
+        'call sp_admin_listar_recolector(?,?,?)',
+        [numero_carnet, apellidos_nombres, estado]
       );
 
       return recolector;

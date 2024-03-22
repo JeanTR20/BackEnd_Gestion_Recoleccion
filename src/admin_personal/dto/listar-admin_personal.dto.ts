@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsNumber, IsNumberString, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsBoolean, IsNumber, IsNumberString, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class ListarAdminPersonal{
 
@@ -13,4 +13,8 @@ export class ListarAdminPersonal{
     @IsOptional()
     @IsString({message: 'La variable apellidos_nombres deben ser de tipo string'})
     apellidos_nombres?: string;
+
+    @Type(()=> Boolean)
+    @IsBoolean({message: 'La variable estado debe ser de tipo boleano'})
+    estado:Boolean
 }
