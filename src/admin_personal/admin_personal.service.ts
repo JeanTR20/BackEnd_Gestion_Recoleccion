@@ -18,12 +18,13 @@ export class AdminPersonalService {
   async listarRecolector( listarAdminPersonal:ListarAdminPersonal){
     try {
       const {numero_carnet, apellidos_nombres, estado} = listarAdminPersonal;
-
+      console.log(listarAdminPersonal.estado)
       const [recolector] = await this.adminPersonalRepository.query(
         'call sp_admin_listar_recolector(?,?,?)',
         [numero_carnet, apellidos_nombres, estado]
+        
       );
-
+      // console.log(numero_carnet, apellidos_nombres, estado)
       return recolector;
     } catch (error) {
       throw new BadRequestException('error al listar '+ error.message)

@@ -17,7 +17,7 @@ export class AdminPersonalController {
   })
   @ApiOperation({
     summary: 'Listar personal(recolector) - admin',
-    description: 'Esta Api permite listar y filtrar los datos de usuario personal(recolector), mediante el Query:{"numero_carnet":"number", {"apellidos_nombres":"string"}}, SP: sp_admin_listar_recolector(?,?) '
+    description: 'Esta Api permite listar y filtrar los datos de usuario personal(recolector), mediante el Query:{"numero_carnet":"number","apellidos_nombres":"string"}, SP: sp_admin_listar_recolector(?,?) '
   })
   listarrecolector(
     @Query() listarAdminPersonal: ListarAdminPersonal

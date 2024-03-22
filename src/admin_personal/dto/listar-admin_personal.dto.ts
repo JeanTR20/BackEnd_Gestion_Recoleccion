@@ -1,5 +1,6 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsBoolean, IsNumber, IsNumberString, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsBoolean, IsBooleanString, IsIn, IsNumber, IsNumberString, IsOptional, IsString, MaxLength, Min, MinLength } from "class-validator";
 
 export class ListarAdminPersonal{
 
@@ -14,7 +15,8 @@ export class ListarAdminPersonal{
     @IsString({message: 'La variable apellidos_nombres deben ser de tipo string'})
     apellidos_nombres?: string;
 
-    @Type(()=> Boolean)
-    @IsBoolean({message: 'La variable estado debe ser de tipo boleano'})
-    estado:Boolean
+    @Type(()=> Number)
+    @IsNumber()
+    @IsIn([0, 1], {message: '0 -> false(cuenta suspendida) , 1 -> true(cuenta activa)'})
+    estado: number;
 }
