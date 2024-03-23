@@ -41,11 +41,14 @@ export class ReporteIncidenciaService {
   async listarIncidencia(listarIncidenciaDto: ListarIncidenciaDto){
     try {
       const {id_rol, direccion, fecha_reporte} = listarIncidenciaDto;
+
+      const fechaformateado = fecha_reporte? new Date(fecha_reporte).toISOString().split('T')[0]: null;
+
       const [incidencia] = await this.reporteIncidenciaRepository.query(
         'call sp_admin_listar_reporte_incidencia(?,?,?)', 
-        [id_rol, direccion, fecha_reporte]
+        [id_rol, direccion, fechaformateado]
       );
-
+      
       return incidencia;
     } catch (error) {
       throw new BadRequestException('Error al listar', error.message)
