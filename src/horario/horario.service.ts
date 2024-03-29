@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Horario } from './entities/horario.entity';
 import { Repository } from 'typeorm';
 import { DataListarHorarioDto } from './dto/data-listar-horario.dto';
+import { DataAnadirRutaDto } from './dto/data-anadir_ruta.dto';
 
 @Injectable()
 export class HorarioService {
@@ -26,6 +27,16 @@ export class HorarioService {
     }
   }
 
+  async anadirRuta( {ruta_nombre, ruta_descripcion}: DataAnadirRutaDto){
+    try {
+      await this.horarioRepository.query(
+        'call sp_admin_anadir_ruta(?,?)', [ruta_nombre, ruta_descripcion]
+      );
+      return { message: 'Se registro exitosamente la nueva ruta'}
+    } catch (error) {
+      throw new BadRequestException('Error al registrar, '+ error.message)
+    }
+  }
   // create(createHorarioDto: CreateHorarioDto) {
   //   return 'This action adds a new horario';
   // }

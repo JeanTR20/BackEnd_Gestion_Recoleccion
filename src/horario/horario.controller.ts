@@ -4,6 +4,7 @@ import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DataListarHorarioDto } from './dto/data-listar-horario.dto';
+import { DataAnadirRutaDto } from './dto/data-anadir_ruta.dto';
 
 @ApiTags('Horario')
 @Controller('horario')
@@ -27,6 +28,21 @@ export class HorarioController {
   }
 
   
+  @Post()
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Añadir nueva ruta - admin',
+    description:
+      'Esta API permite añadir una nueva ruta para los horario de recoleccion, mediante los parametros:{"ruta_nombre":"String", "ruta_descripcion":"string"}. SP: sp_admin_anadir_ruta(?,?)',
+  })
+  anadirruta(
+    @Body() dataAnadirRutaDto: DataAnadirRutaDto
+  ){
+    return this.horarioService.anadirRuta(dataAnadirRutaDto);
+  }
   // @Post()
   // create(@Body() createHorarioDto: CreateHorarioDto) {
   //   return this.horarioService.create(createHorarioDto);
