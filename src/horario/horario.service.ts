@@ -27,6 +27,8 @@ export class HorarioService {
     }
   }
 
+
+  // admin
   async anadirRuta( {ruta_nombre, ruta_descripcion}: DataAnadirRutaDto){
     try {
       await this.horarioRepository.query(
@@ -37,6 +39,8 @@ export class HorarioService {
       throw new BadRequestException('Error al registrar, '+ error.message)
     }
   }
+
+  
   // create(createHorarioDto: CreateHorarioDto) {
   //   return 'This action adds a new horario';
   // }
