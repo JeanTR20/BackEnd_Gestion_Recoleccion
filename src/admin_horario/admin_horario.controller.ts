@@ -9,6 +9,23 @@ import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 export class AdminHorarioController {
   constructor(private readonly adminHorarioService: AdminHorarioService) {}
 
+
+  @Post()
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Crear Horario',
+    description:
+      'Esta API permite crear un nuevo horario de recoleccion de basura, mediante los parametros:{"dia":"string", "hora_inicio":"date", "recorrido":"string", "referencia_punto":"string" , "ruta_id":"string"}. SP: sp_admin_crear_horario(?,?,?,?,?)',
+  })
+  crearhorario(
+    @Body() createAdminHorarioDto: CreateAdminHorarioDto
+  ){
+    return this.adminHorarioService.crearHorario(createAdminHorarioDto)
+  }
+
   // @Get()
   // @ApiHeader({
   //   name: 'api-key',

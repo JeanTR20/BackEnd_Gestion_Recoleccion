@@ -13,16 +13,20 @@ export class AdminHorarioService {
     private readonly adminHorarioRepository: Repository<AdminHorario> 
   ){}
 
-  // async listarhorario(){
-  //   try {
-  //     const [horario] = await this.adminHorarioRepository.query(
-  //       'call sp_admin_listar_horario()'
-  //     );
-  //     return horario;
-  //   } catch (error) {
-  //     throw new BadRequestException('Error al listar, ' + error.message)
-  //   }
-  // }
+  async crearHorario(createAdminHorarioDto: CreateAdminHorarioDto){
+    try {
+      const {dia, hora_inicio, recorrido, referencia_punto, ruta_id} = createAdminHorarioDto
+      await this.adminHorarioRepository.query(
+        'call sp_admin_crear_horario(?,?,?,?,?)', 
+        [dia, hora_inicio, recorrido, referencia_punto, ruta_id]
+      );
+
+      return { message: 'se creo existosamente un nuevo horario'}
+
+    } catch (error) {
+      
+    }
+  }
 
   // create(createAdminHorarioDto: CreateAdminHorarioDto) {
   //   return 'This action adds a new adminHorario';
