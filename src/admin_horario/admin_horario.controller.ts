@@ -26,6 +26,10 @@ export class AdminHorarioController {
     return this.adminHorarioService.crearHorario(createAdminHorarioDto)
   }
 
+  @Delete('eliminar-horario/:id_horario')
+  deletehorario(@Param('id_horario') id_horario: number){
+    return this.adminHorarioService.deleteHorario(id_horario);
+  }
   // @Get()
   // @ApiHeader({
   //   name: 'api-key',

@@ -29,6 +29,19 @@ export class AdminHorarioService {
     }
   }
 
+  async deleteHorario(id_horario: number){
+    try {
+      await this.adminHorarioRepository.query(
+        'call sp_admin_eliminar_horario(?)', [id_horario]
+      );
+      return {
+        message: 'se elimino un registro de la tabla horario'
+      }
+    } catch (error) {
+      throw new BadRequestException('Error ', error.message)
+    }
+  }
+
   // create(createAdminHorarioDto: CreateAdminHorarioDto) {
   //   return 'This action adds a new adminHorario';
   // }
