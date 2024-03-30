@@ -16,6 +16,7 @@ export class AdminHorarioService {
   async crearHorario(createAdminHorarioDto: CreateAdminHorarioDto){
     try {
       const {dia, hora_inicio, recorrido, referencia_punto, ruta_id} = createAdminHorarioDto
+      
       await this.adminHorarioRepository.query(
         'call sp_admin_crear_horario(?,?,?,?,?)', 
         [dia, hora_inicio, recorrido, referencia_punto, ruta_id]

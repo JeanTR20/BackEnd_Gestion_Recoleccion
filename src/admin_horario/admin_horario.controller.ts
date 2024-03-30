@@ -10,7 +10,7 @@ export class AdminHorarioController {
   constructor(private readonly adminHorarioService: AdminHorarioService) {}
 
 
-  @Post()
+  @Post('crear-horario')
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
