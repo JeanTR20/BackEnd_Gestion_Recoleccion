@@ -28,7 +28,7 @@ export class HorarioController {
   }
 
   
-  @Post()
+  @Post('anadir-ruta')
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
@@ -42,6 +42,20 @@ export class HorarioController {
     @Body() dataAnadirRutaDto: DataAnadirRutaDto
   ){
     return this.horarioService.anadirRuta(dataAnadirRutaDto);
+  }
+
+  @Get('listar-ruta')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Listar ruta - admin',
+    description:
+      'Esta API permite listar las rutas del camion recolector, SP: sp_admin_listar_ruta()',
+  })
+  listarruta(){
+    return this.horarioService.listarRuta()
   }
   // @Post()
   // create(@Body() createHorarioDto: CreateHorarioDto) {

@@ -40,7 +40,17 @@ export class HorarioService {
     }
   }
 
-  
+  async listarRuta(){
+    try {
+      const [listarRuta] = await this.horarioRepository.query(
+        'call sp_admin_listar_ruta()',[]
+      );
+      return listarRuta;
+    } catch (error) {
+      throw new BadRequestException('Error, '+ error.message)
+    }
+  }
+
   // create(createHorarioDto: CreateHorarioDto) {
   //   return 'This action adds a new horario';
   // }
