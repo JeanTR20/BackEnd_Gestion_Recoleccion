@@ -7,6 +7,7 @@ export class CreateAdminHorarioDto {
     @IsIn(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'], {})
     dia: string;
 
+    @Type(() => Date)
     @IsDate({message: 'La variable hora_inicio debe ser de tipo date'})
     @IsNotEmpty({message: 'La variable hora_inicio no debe estar vacio'})
     hora_inicio: Date;

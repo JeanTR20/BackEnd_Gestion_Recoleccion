@@ -24,7 +24,7 @@ export class AdminHorarioService {
       return { message: 'se creo existosamente un nuevo horario'}
 
     } catch (error) {
-      
+      throw new BadRequestException('Error, ' + error.message);
     }
   }
 
