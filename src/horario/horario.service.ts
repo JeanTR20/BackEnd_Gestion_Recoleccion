@@ -15,11 +15,12 @@ export class HorarioService {
     private horarioRepository: Repository<Horario>,
   ){}
 
-  async listarHorario( {ruta, dia}: DataListarHorarioDto){
+  async listarHorario( dataListarHorarioDto: DataListarHorarioDto){
     try {
+      const {id_ruta, dia} = dataListarHorarioDto
       const [horario] = await this.horarioRepository.query(
         'call sp_listar_horario(?,?)', 
-        [ruta, dia]
+        [id_ruta, dia]
       );
       return horario;
     } catch (error) {
