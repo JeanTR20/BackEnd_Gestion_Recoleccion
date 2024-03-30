@@ -18,7 +18,6 @@ export class CreateAdminHorarioDto {
     
     @IsString({message: 'La variable referencia_punto debe ser de tipo string'})
     @IsOptional()
-    @IsNotEmpty({message: 'La variable referencia_punto no debe estar vacio'})
     referencia_punto?: string;
     
     @Type(()=> Number)
