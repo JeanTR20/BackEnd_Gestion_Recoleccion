@@ -28,7 +28,6 @@ export class HorarioService {
     }
   }
 
-
   // admin
   async anadirRuta( {ruta_nombre, ruta_descripcion}: DataAnadirRutaDto){
     try {

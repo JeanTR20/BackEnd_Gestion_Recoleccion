@@ -29,13 +29,28 @@ export class AdminHorarioService {
     }
   }
 
+  async actualizarHorario(id_horario, updateAdminHorarioDto: UpdateAdminHorarioDto){
+    try {
+      const {dia, hora_inicio, recorrido, referencia_punto, ruta_id}= updateAdminHorarioDto;
+      await this.adminHorarioRepository.query(
+        'Call sp_admin_actualizar_horario(?,?,?,?,?,?)',
+        [id_horario, dia, hora_inicio, recorrido, referencia_punto, ruta_id]
+      );
+      return{
+        message: 'Se actualizó exitamente'
+      }
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
+    }
+  }
+
   async deleteHorario(id_horario: number){
     try {
       await this.adminHorarioRepository.query(
         'call sp_admin_eliminar_horario(?)', [id_horario]
       );
       return {
-        message: 'se elimino un registro de la tabla horario'
+        message: 'Se elimino un registro de la tabla horario'
       }
     } catch (error) {
       throw new BadRequestException('Error ', error.message)
