@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsIn, IsInt, IsNumber, IsNumberString, IsString, Min, isIn, } from "class-validator";
+import { IsIn, IsInt, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Min, isIn, } from "class-validator";
 
 export class DataListarHorarioDto{
 
@@ -9,5 +9,10 @@ export class DataListarHorarioDto{
     id_ruta: number;
 
     @IsString({message: 'La variable dia debe ser de tipo string'})
+    @IsNotEmpty({message: 'La variable dia no debe estar vacion'})
     dia: string;
+
+    @IsString({message: 'La variable recorrido debe ser de tipo string'})
+    @IsOptional({message: 'La variable recorrido no debe estar vacio'})
+    recorrido?: string;
 }
