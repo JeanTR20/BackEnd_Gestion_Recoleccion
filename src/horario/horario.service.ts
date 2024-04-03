@@ -40,6 +40,17 @@ export class HorarioService {
     }
   }
 
+  async eliminarRuta(id_ruta: number){
+    try {
+      await this.horarioRepository.query(
+        'call sp_admin_eliminar_ruta(?)', [id_ruta]
+      );
+      return { message: 'Se elimino correctamente la ruta'}
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
+    }
+  }
+
   async listarRuta(){
     try {
       const [listarRuta] = await this.horarioRepository.query(

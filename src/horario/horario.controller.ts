@@ -57,6 +57,21 @@ export class HorarioController {
   listarruta(){
     return this.horarioService.listarRuta()
   }
+
+  @Delete('eliminar-ruta/:id_ruta')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'eliminar ruta - admin',
+    description:
+      'Esta API permite eliminar un registro de ruta del camion recolector, SP: sp_admin_eliminar_ruta()',
+  })
+  deleteruta(@Param('id_ruta') id_ruta:number ){
+    return this.horarioService.eliminarRuta(id_ruta)
+  }
+
   // @Post()
   // create(@Body() createHorarioDto: CreateHorarioDto) {
   //   return this.horarioService.create(createHorarioDto);
