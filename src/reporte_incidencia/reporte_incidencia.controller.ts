@@ -44,6 +44,24 @@ export class ReporteIncidenciaController {
     return this.reporteIncidenciaService.listarIncidencia(listarIncidenciaDto)
   }
 
+  @Patch('actualizar-estado/:id_incidencia')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  
+  @ApiOperation({
+    summary: 'actualizar estado de incidencia - admin',
+    description:
+      'Esta API permite actualizar un estado de un reporte, mediante los parametros:{"id_incidencia":"number"} y Body: {"estado": "string"}, SP: call sp_admin_actualizar_estado_incidencia(?,?)',
+  })
+  updateincidencia(
+    @Param('id_incidencia') id_incidencia: number,
+    @Body() updateReporteIncidenciaDto : UpdateReporteIncidenciaDto
+  ){
+    return this.reporteIncidenciaService.actualizarEstado(id_incidencia, updateReporteIncidenciaDto)
+  }
+
   // @Post()
   // create(@Body() createReporteIncidenciaDto: CreateReporteIncidenciaDto) {
   //   return this.reporteIncidenciaService.create(createReporteIncidenciaDto);

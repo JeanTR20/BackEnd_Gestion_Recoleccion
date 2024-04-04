@@ -6,6 +6,7 @@ import { ReporteIncidencia } from './entities/reporte_incidencia.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
+import { UpdateAdminHorarioDto } from 'src/admin_horario/dto/update-admin_horario.dto';
 
 @Injectable()
 export class ReporteIncidenciaService {
@@ -52,6 +53,20 @@ export class ReporteIncidenciaService {
       return incidencia;
     } catch (error) {
       throw new BadRequestException('Error al listar', error.message)
+    }
+  }
+
+
+  async actualizarEstado(id_incidencia: number, {estado}: UpdateReporteIncidenciaDto){
+    try {
+      await this.reporteIncidenciaRepository.query(
+        'call sp_admin_actualizar_estado_incidencia(?,?)', [id_incidencia, estado]
+      );
+      return {
+        message: 'Se actualizo la estado de la incidencia exitosamente'
+      }
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
     }
   }
 

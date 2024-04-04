@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDate, IsInt, IsNotEmpty, IsNumber, IsString, Length, MaxLength, Min } from "class-validator";
+import { IsDate, IsIn, IsInt, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Length, MaxLength, Min } from "class-validator";
 
 export class CreateReporteIncidenciaDto {
     @IsString({message: 'La variable descripcion debe ser de tipo string'})
