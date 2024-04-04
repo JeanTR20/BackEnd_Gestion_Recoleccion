@@ -1,5 +1,5 @@
 import { Type } from "class-transformer"
-import { IsDate, IsIn, IsNumber, IsNumberString, IsOptional, IsString, Min } from "class-validator"
+import { IsBoolean, IsDate, IsIn, IsInt, IsNumber, IsNumberString, IsOptional, IsString, Min } from "class-validator"
 import { NumericType } from "typeorm"
 
 export class ListarIncidenciaDto{
@@ -15,4 +15,9 @@ export class ListarIncidenciaDto{
     @Type(()=> Date)
     @IsDate({message: 'La variable fecha_reporte debe ser de tipo date'})
     fecha_reporte?: Date
+
+    @IsOptional()
+    @IsNumberString({}, {message: 'La variable estado debe ser de tipo numerico string'})
+    @IsIn(['0', '1'], {message: '0 -> estado pendiente, 1 -> estado culminado'})
+    estado?: number
 }

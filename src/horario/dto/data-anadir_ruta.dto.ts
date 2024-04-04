@@ -8,6 +8,5 @@ export class DataAnadirRutaDto{
 
     @IsOptional()
     @IsString({message: 'La variable ruta_descripcion debe ser de tipo string'})
-    @IsNotEmpty({message: 'La variable ruta_descripcion no debe estar vacio'})
     ruta_descripcion?: string;
 }

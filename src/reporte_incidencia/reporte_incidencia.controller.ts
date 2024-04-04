@@ -36,7 +36,7 @@ export class ReporteIncidenciaController {
   @ApiOperation({
     summary: 'Listar incidencia - admin',
     description:
-      'Esta API permite listar y filtrar los reporte de los usuario, mediante los parametros:{"direccion": "string", "fecha_reporte": "string"}, SP: call sp_admin_listar_reporte_incidencia(?,?)',
+      'Esta API permite listar y filtrar los reporte de los usuario, mediante los parametros:{"id_rol":"number", direccion": "string", "fecha_reporte": "string", "estado": "string"}, SP: call sp_admin_listar_reporte_incidencia(?,?,?,?)',
   })
   listarincidencia(
     @Query() listarIncidenciaDto: ListarIncidenciaDto
