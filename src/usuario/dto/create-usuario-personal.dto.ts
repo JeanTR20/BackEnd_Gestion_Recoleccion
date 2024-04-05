@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsIn } from 'class-validator';
+import { IsString, IsNotEmpty, IsIn, IsOptional } from 'class-validator';
 
 export class CreateUsuarioPersonal{
     
@@ -40,8 +40,8 @@ export class CreateUsuarioPersonal{
     @IsIn(['Masculino', 'Femenino'])
     genero:string;
     
+    @IsOptional()
     @IsString({message: 'La variable imagen debe ser string'})
-    @IsNotEmpty({message: 'La variable imagen no debe estar vacio'})
     imagen?:string;
     
     @IsString({message: 'La variable correo debe ser string'})
