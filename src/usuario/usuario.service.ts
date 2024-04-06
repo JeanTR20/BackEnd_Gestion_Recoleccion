@@ -110,20 +110,20 @@ export class UsuarioService {
         [carnet_identidad, correo]
       );
 
-      if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad && usuario.usuario_correo === correo )){
-        throw new BadRequestException('El carnet de identidad y el correo ya existe')
-      }
+      // if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad && usuario.usuario_correo === correo )){
+      //   throw new BadRequestException('El carnet de identidad y el correo ya existe')
+      // }
 
-      if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad )){
-        throw new BadRequestException('El carnet de identidad ya existe')
-      }
+      // if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad )){
+      //   throw new BadRequestException('El carnet de identidad ya existe')
+      // }
 
-      if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
-        throw new BadRequestException('El correo ya existe')
-      }
+      // if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
+      //   throw new BadRequestException('El correo ya existe')
+      // }
 
       await this.usuarioRespository.query(
-        'call sp_admin_actualizar_personal(?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        'call sp_admin_actualizar_personal(?,?,?,?,?,?,?,?,?,?,?,?)',
         [ 
           id_usuario,
           nombre_completo, 
@@ -137,7 +137,6 @@ export class UsuarioService {
           genero,
           correo,
           nombre_usuario,
-          contrasena,
         ]
       );
 

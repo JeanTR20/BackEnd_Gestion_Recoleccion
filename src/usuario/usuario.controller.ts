@@ -27,7 +27,7 @@ export class UsuarioController {
     return this.usuarioService.crearUsuarioPersonal(crearUsuarioPersonal);
   }
 
-  @Patch('Actualizar-personal/:id_usuario')
+  @Patch('actualizar-personal/:id_usuario')
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
