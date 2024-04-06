@@ -1,6 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/usuario.entity';
 import { Repository } from 'typeorm';
@@ -9,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUsuarioPersonal } from './dto/create-usuario-personal.dto';
 import { dir } from 'console';
 import * as bcryptjs from 'bcryptjs';
+import { UpdateUsuarioPersonalDto } from './dto/update-usuario-personal.dto';
 
 @ApiTags('Usuario')
 @Injectable()
@@ -87,6 +86,66 @@ export class UsuarioService {
       throw new BadRequestException('Erro al registrar, ' + error.message)
     }
 
+  }
+
+  async ActualizarPersonal(id_usuario: number, updateUsuarioPersonalDto: UpdateUsuarioPersonalDto){
+    try {
+      const {
+        nombre_completo, 
+        apellido_paterno, 
+        apellido_materno, 
+        fecha_nacimiento, 
+        direccion,
+        telefono,
+        tipo_carnet,
+        carnet_identidad,
+        genero, 
+        correo,
+        nombre_usuario,
+        contrasena
+      } = updateUsuarioPersonalDto;
+
+      const validarCorreoUsuario = await this.usuarioRespository.query(
+        'SELECT usuario_carnet_identidad, usuario_correo FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_correo = ?',
+        [carnet_identidad, correo]
+      );
+
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad && usuario.usuario_correo === correo )){
+        throw new BadRequestException('El carnet de identidad y el correo ya existe')
+      }
+
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad )){
+        throw new BadRequestException('El carnet de identidad ya existe')
+      }
+
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
+        throw new BadRequestException('El correo ya existe')
+      }
+
+      await this.usuarioRespository.query(
+        'call sp_admin_actualizar_personal(?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [ 
+          id_usuario,
+          nombre_completo, 
+          apellido_paterno, 
+          apellido_materno, 
+          fecha_nacimiento,
+          direccion,
+          telefono,
+          tipo_carnet,
+          carnet_identidad,
+          genero,
+          correo,
+          nombre_usuario,
+          contrasena,
+        ]
+      );
+
+      return {message: 'Se actualizo el usuario exitosamente'}
+
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
+    }
   }
 
   

@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUsuarioPersonal } from './dto/create-usuario-personal.dto';
+import { UpdateUsuarioPersonalDto } from './dto/update-usuario-personal.dto';
 
 @ApiTags('Usuario')
 @Controller('usuario')
@@ -18,13 +19,31 @@ export class UsuarioController {
   @ApiOperation({
     summary: 'Crear usuario personal',
     description:
-      'Esta API permite crear un usuario para el personal(recolector) mediante los los parametros:{"nombre_completo":"string", "apellido_paterno":"string", "apellido_paterno":"string", "apellido_materno":"string","fecha_nacimiento":"string", "direccion":"string", "telefono":"string", "tipo_carnet":"string","carnet_identidad":"string" ,"genero":"string", "imagen":"string", "correo":"string", "nombre_usuario":"string", "contrasena":"string"}. SP: sp_admin_crear_usuario_personal()',
+      'Esta API permite crear un usuario personal(recolector) mediante los parametros:{"nombre_completo":"string", "apellido_paterno":"string", "apellido_paterno":"string", "apellido_materno":"string","fecha_nacimiento":"string", "direccion":"string", "telefono":"string", "tipo_carnet":"string","carnet_identidad":"string" ,"genero":"string", "imagen":"string", "correo":"string", "nombre_usuario":"string", "contrasena":"string"}. SP: sp_admin_crear_usuario_personal()',
   })
   crearusuariopersonal(
     @Body() crearUsuarioPersonal:CreateUsuarioPersonal
   ){
     return this.usuarioService.crearUsuarioPersonal(crearUsuarioPersonal);
   }
+
+  @Patch('Actualizar-personal/:id_usuario')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Actualizar usuario personal',
+    description:
+      'Esta API permite actualizar el usuario personal(recolector) mediante los parametros:{"id_usuario":"number", "nombre_completo":"string", "apellido_paterno":"string", "apellido_paterno":"string", "apellido_materno":"string","fecha_nacimiento":"string", "direccion":"string", "telefono":"string", "tipo_carnet":"string","carnet_identidad":"string" ,"genero":"string", "imagen":"string", "correo":"string", "nombre_usuario":"string", "contrasena":"string"}. SP: sp_admin_actualizar_personal()',
+  })
+  ActualizarPersonal(
+    @Param('id_usuario') id_usuario: number,
+    @Body() updateUsuarioPersonalDto: UpdateUsuarioPersonalDto
+  ){
+    return this.usuarioService.ActualizarPersonal(id_usuario, updateUsuarioPersonalDto)
+  }
+
   // @Post()
   // create(@Body() createUsuarioDto: CreateUsuarioDto) {
   //   return this.usuarioService.create(createUsuarioDto);
