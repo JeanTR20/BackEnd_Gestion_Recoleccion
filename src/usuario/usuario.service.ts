@@ -147,6 +147,17 @@ export class UsuarioService {
     }
   }
 
+  async darBajaUsuario(id_usuario: number){
+    try {
+      await this.usuarioRespository.query(
+        'call sp_admin_dar_baja_usuario_personal(?)',
+        [id_usuario]
+      );
+      return {message: 'Se dio de baja al usuario exitosamente'}
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
+    }
+  }
   
   // async recuperarContrasena(token: string){
   //   try {

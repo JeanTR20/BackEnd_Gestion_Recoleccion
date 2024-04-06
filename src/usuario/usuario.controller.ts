@@ -44,6 +44,22 @@ export class UsuarioController {
     return this.usuarioService.ActualizarPersonal(id_usuario, updateUsuarioPersonalDto)
   }
 
+  @Patch('dar-baja-usuario/:id_usuario')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Dar de baja a usuario',
+    description:
+      'Esta API permite dar de baja a usuario personal(recolector) mediante el parametro:{"id_usuario":"number"}. SP: sp_admin_dar_baja_usuario_personal()',
+  })
+  darbajausuario(
+    @Param('id_usuario') id_usuario: number 
+  ){
+    return this.usuarioService.darBajaUsuario(id_usuario)
+  }
+
   // @Post()
   // create(@Body() createUsuarioDto: CreateUsuarioDto) {
   //   return this.usuarioService.create(createUsuarioDto);
