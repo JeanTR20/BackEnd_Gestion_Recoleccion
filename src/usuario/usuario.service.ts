@@ -88,7 +88,7 @@ export class UsuarioService {
 
   }
 
-  async ActualizarPersonal(id_usuario: number, updateUsuarioPersonalDto: UpdateUsuarioPersonalDto){
+  async actualizarPersonal(id_usuario: number, updateUsuarioPersonalDto: UpdateUsuarioPersonalDto){
     try {
       const {
         nombre_completo, 
@@ -159,6 +159,19 @@ export class UsuarioService {
     }
   }
   
+  async activarCuenta(id_usuario: number){
+    try {
+      await this.usuarioRespository.query(
+        'call sp_admin_activar_cuenta(?)',
+        [id_usuario]
+      );
+      return {message: 'Se activo su cuenta exitosamente'}
+    } catch (error) {
+      throw new BadRequestException('Error, '+ error.message)
+    }
+  }
+
+
   // async recuperarContrasena(token: string){
   //   try {
   //     const decoded = await this.jwtService.verifyAsync(token);
