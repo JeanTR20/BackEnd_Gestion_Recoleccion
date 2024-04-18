@@ -4,11 +4,10 @@ import { IsBoolean, IsBooleanString, IsIn, IsNumber, IsNumberString, IsOptional,
 
 export class ListarAdminPersonal{
 
-    @Type(()=> Number)
     @IsOptional()
     @IsNumberString({}, {message: 'La variable numero_carnet debe ser de tipo numerico string'})
     @MaxLength(11, {message: 'La variable numero carnet debe ser maximo de 11 digitos'})
-    @MinLength(8, {message: 'La variable numero carnet debe ser minimo de 6 digitos'})
+    @MinLength(8, {message: 'La variable numero carnet debe ser minimo de 8 digitos'})
     numero_carnet?: string;
 
     @IsOptional()
