@@ -3,18 +3,20 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { Type } from 'class-transformer';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private authService: AuthService
   ){}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
 
     const request = context.switchToHttp().getRequest();
    
-    const token = this.extractToken(request);
+    const token = this.extractTokenFromHeader(request);
 
     if(!token){
       throw new UnauthorizedException('Token invalido o expirado')
@@ -24,26 +26,24 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SEED,
       });
-      request.user = payload;
-      console.log(request.user)
+      
+      const user = await this.authService.obtenerDatosById(payload.id_usuario)
+
+      if(!user.user) throw new UnauthorizedException('El usuario no existe');
+
+      if(!user.user.usuario_estado) throw new UnauthorizedException('El usuario no esta activo');
+      
+      request['user'] = user;
 
     } catch (error) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('error, '+ error.message);
     }
 
     return true;
   }
 
-  private extractToken(request: Request) {
-    if(request.headers.authorization && request.headers.authorization.startsWith('Bearer ')){
-      const [, token] = request.headers.authorization?.split(" ");
-      return token;
-    }
-    
-    return undefined;
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers['authorization']?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
-  // private extractToken(request: Request) {
-  //   const [type, token] = request.headers.authorization?.split(" ") ?? [];
-  //   return type === "Bearer" ? token : undefined;
-  // }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Request,Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request,Patch, Param, Delete, Query, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -11,6 +11,7 @@ import { EnvioCorreoAuthDto } from './dto/envio-correo-auth.dto';
 import { AuthGuard } from './guard/auth.guard';
 import { Roles } from './decorators/roles.decorator';
 import { RolesGuard } from './guard/roles.guard';
+import { request } from 'http';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -85,7 +86,6 @@ export class AuthController {
 
 
   @Post('enviar-correo')
-  
   @ApiHeader({
     name: 'api-key',
    description: 'Contra de API',
@@ -115,6 +115,22 @@ export class AuthController {
     return this.authService.recoverPassword(recoverAuthDto)
   }
 
+  // @Get('validar-token')
+  // @ApiHeader({
+  //   name: 'api-key',
+  //   description: 'Contra de API',
+  // })
+  
+  // @ApiOperation({
+  //   summary: 'Validar token 2',
+  //   description:
+  //     'Esta API obtiene los datos del usuario, mediante los parametros:{"token": "string"}, SP: call sp_validar_login(?)',
+  // })
+  // validarToken(@Request() req: Request) {
+  //   const user = req['user']
+  //   return this.authService.obtenerDatos(user)
+  // }
+
   // @Post()
   // @ApiHeader({
   //   name: 'api-key',
@@ -135,10 +151,12 @@ export class AuthController {
   //   return this.authService.create(createAuthDto);
   // }
 
-  // @Get()
-  // findAll() {
-  //   return this.authService.findAll();
-  // }
+  @Get()
+  @UseGuards(AuthGuard)
+  findAll( @Request() req: Request) {
+    const user = req['user'];
+    return this.authService.findAll;
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {

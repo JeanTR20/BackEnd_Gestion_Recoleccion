@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, Body, Query, ConsoleLogger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,6 +15,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { EnvioCorreoAuthDto } from './dto/envio-correo-auth.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 
 @Injectable()
@@ -102,17 +103,19 @@ export class AuthService {
   }
 
   async obtenerDatos(token: string){
-
-    const idtoken = await this.obtenerTokenUsuario(token)
+    
+    const idUsuario = await this.obtenerTokenUsuario(token)
     const [datos] = await this.authRepository.query(
-      'CALL sp_validar_login(?)', [idtoken]
+      'CALL sp_validar_login(?)', [idUsuario]
       
     );
-    console.log(datos)
     return {
       user: {
         usuario_id: datos[0].usuario_id,
         usuario_nombre: datos[0].usuario_nombre_usuario,
+        usuario_nombre_completo: datos[0].usuario_nombre_completo,
+        usuario_apellido_paterno: datos[0].usuario_apellido_paterno,
+        usuario_apellido_materno: datos[0].usuario_apellido_materno,
         usuario_correo: datos[0].usuario_correo,
         usuario_estado: datos[0].usuario_estado,
         rol_nombre: datos[0].rol_nombre
@@ -232,14 +235,30 @@ export class AuthService {
     }
   }
   
-
+ 
   // create(createAuthDto: CreateAuthDto) {
   //   return 'This action adds a new auth';
   // }
 
-  // findAll() {
-  //   return `This action returns all auth`;
-  // }
+  async obtenerDatosById(id_usuario: string){
+
+    const [datos] = await this.authRepository.query(
+      'CALL sp_validar_login(?)', [id_usuario]
+    );
+    return {
+      user: {
+        usuario_id: datos[0].usuario_id,
+        usuario_nombre: datos[0].usuario_nombre_usuario,
+        usuario_correo: datos[0].usuario_correo,
+        usuario_estado: datos[0].usuario_estado,
+      }
+    }
+  }
+
+
+  findAll() {
+    return `This action returns all auth`;
+  }
 
   // findOne(id: number) {
   //   return `This action returns a #${id} auth`;
