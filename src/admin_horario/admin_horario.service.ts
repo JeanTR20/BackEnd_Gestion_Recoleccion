@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Get, Injectable, Query } from '@nestjs/common';
 import { CreateAdminHorarioDto } from './dto/create-admin_horario.dto';
 import { UpdateAdminHorarioDto } from './dto/update-admin_horario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AdminHorario } from './entities/admin_horario.entity';
 import { Repository } from 'typeorm';
+import { ListAdminHorarioDto } from './dto/list-admin-horario.dto';
 
 @Injectable()
 export class AdminHorarioService {
@@ -54,6 +55,18 @@ export class AdminHorarioService {
       }
     } catch (error) {
       throw new BadRequestException('Error ', error.message)
+    }
+  }
+
+  async listarHorario(listAdminHorarioDto: ListAdminHorarioDto){
+    try {
+      const {id_ruta, dia, recorrido} = listAdminHorarioDto
+      const [horario] = await this.adminHorarioRepository.query(
+        'call sp_admin_listar_horario(?,?,?)', [id_ruta, dia, recorrido]
+      );
+      return horario;
+    } catch (error) {
+      throw new BadRequestException('Error, '+ error.message)
     }
   }
 
