@@ -6,13 +6,16 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notificacion } from './entities/notificacion.entity';
 import { title } from 'process';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class NotificacionService {
   constructor(
 
+    private readonly authService: AuthService,
     @InjectRepository(Notificacion)
-    private readonly notificacionRepository: Repository<Notificacion>
+    private readonly notificacionRepository: Repository<Notificacion>,
+
   ){
 
     webPush.setVapidDetails(
@@ -22,22 +25,46 @@ export class NotificacionService {
     );
   }
 
-  async subscribe(subscription: string) {
-    console.log('Received subscription:', subscription);
+  async subscribe(subscription: any, token:string) {
     try {
+
+      const id_usuario = await this.authService.obtenerTokenUsuario(token);
+
+      const [usuario_existente] = await this.notificacionRepository.query(
+        'SELECT COUNT(*) AS resultado FROM tbl_suscripcion_notificacion WHERE usuario_id = ?',
+        [id_usuario]
+      );
+
+      if(usuario_existente.resultado > 0){
+        throw new BadRequestException('El usuario ya esta registrado con una suscripción')
+      }
+
+      const {endpoint, keys: {p256dh, auth}} = subscription
+
+      await this.notificacionRepository.query(
+        'call sp_registrar_suscripcion_notificacion(?,?,?,?)',
+        [endpoint, p256dh, auth, id_usuario]
+      );
+
       return {message: 'subscripcion guardada existosamente'}
+
     } catch (error) {
       throw new BadRequestException('Error, ' + error.message)
     }
   }
 
-  async enviarNotificaciones() {
+  async enviarNotificaciones(id_usuario: number) {
     
+    const [suscripcion] = await this.notificacionRepository.query(
+      'call sp_obtener_suscripcion_notificacion(?)',
+      [id_usuario]
+    )
+
     const pushSubscription = {
-      endpoint: 'https://fcm.googleapis.com/fcm/send/cqsCDYFEWrM:APA91bE7MZKdqEz99wBv7eybTRa6uvHJqkqG92UnRLFD3kcR_ZG1-0gIlW_R5JqbbYw2tzersHpHEJFk6Z32tFDgcvhTyKR6V230cOqm7683773LI84sHxMK-rQd4ZMSk7W12o-DSstj',
+      endpoint: suscripcion[0].suscripcion_endpoint,
       keys: {
-        auth: 'Z4waj2xmXlo7bRIgSDxB_g',
-        p256dh: 'BIjp3mIidVXNoVcJLHNbD2qLk7ZaVaetwUmiC7bvslclSPLqUyf-RsTpCVMXbR2icLkjYIwttTtFV3w_hjL3Ryo'
+        p256dh: suscripcion[0].suscripcion_p256dh,
+        auth: suscripcion[0].suscripcion_auth
       }
     };
 
@@ -47,10 +74,10 @@ export class NotificacionService {
       body: 'Notificación de recojo de residuos sólidos',
       vibrate: [100, 50, 100],
       icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
-      image: '',
+      badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
       actions: [{
         action: '',
-        title: 'Ir a ecoRecoge'
+        title: 'Cerrar'
       }]
     }
    });

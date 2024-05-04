@@ -3,9 +3,10 @@ import { NotificacionService } from './notificacion.service';
 import { NotificacionController } from './notificacion.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Notificacion } from './entities/notificacion.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Notificacion])],
+  imports: [TypeOrmModule.forFeature([Notificacion]), AuthModule],
   controllers: [NotificacionController],
   providers: [NotificacionService],
 })

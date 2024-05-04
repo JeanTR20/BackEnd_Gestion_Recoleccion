@@ -20,7 +20,7 @@ export class ReporteIncidenciaController {
   @ApiOperation({
     summary: 'Registrar incidencia de residuos',
     description:
-      'Esta API permite registrar el reporte de incidencia de los residentes, mediante los Quey:{"descripcion": "string", "direccion": "string", "referencia_calle": "string", "fecha_reporte": "date", "foto": "string", "token_usuario": "string"}, SP: call sp_registrar_incidencia_reporte(?,?,?,?,?,?)',
+      'Esta API permite registrar el reporte de incidencia de los residentes, mediante los Query:{"descripcion": "string", "direccion": "string", "referencia_calle": "string", "fecha_reporte": "date", "foto": "string", "token_usuario": "string"}, SP: call sp_registrar_incidencia_reporte(?,?,?,?,?,?)',
   })
   registrarReporte( 
     @Body() createReporteIncidenciaDto: CreateReporteIncidenciaDto){

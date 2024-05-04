@@ -88,7 +88,7 @@ export class AuthController {
   @Post('enviar-correo')
   @ApiHeader({
     name: 'api-key',
-   description: 'Contra de API',
+    description: 'Contra de API',
   })
   @ApiOperation({
    summary: 'Envio de correo de restablecimiento de contrasena',
@@ -104,7 +104,7 @@ export class AuthController {
   @Post('actualizar-password')
   @ApiHeader({
     name: 'api-key',
-   description: 'Contra de API',
+    description: 'Contra de API',
   })
   @ApiOperation({
    summary: 'actualizar nueva de contrasena',
