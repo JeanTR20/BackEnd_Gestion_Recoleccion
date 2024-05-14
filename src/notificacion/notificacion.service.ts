@@ -27,7 +27,6 @@ export class NotificacionService {
 
   async subscribe(subscription: any, token:string) {
     try {
-
       const id_usuario = await this.authService.obtenerTokenUsuario(token);
 
       const [usuario_existente] = await this.notificacionRepository.query(
@@ -36,7 +35,7 @@ export class NotificacionService {
       );
 
       if(usuario_existente.resultado > 0){
-        throw new BadRequestException('El usuario ya esta registrado con una suscripción')
+        throw new BadRequestException('el usuario ya esta registrado con una suscripción')
       }
 
       const {endpoint, keys: {p256dh, auth}} = subscription
@@ -49,7 +48,7 @@ export class NotificacionService {
       return {message: 'subscripcion guardada existosamente'}
 
     } catch (error) {
-      throw new BadRequestException('Error, ' + error.message)
+      throw new BadRequestException('`Error al procesar la solicitud, ' + error.message)
     }
   }
 

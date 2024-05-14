@@ -41,11 +41,12 @@ export class NotificacionController {
   enviarnotificacion(@Request() req: Request ){
     const user = req['user']
     const id_usuario = user.user.usuario_id
-    //console.log('user: ', user)
-    //console.log('ID USUARIO: ', id_usuario)
+    // console.log('user: ', user)
+    // console.log('ID USUARIO: ', id_usuario)
    return this.notificacionService.enviarNotificaciones(id_usuario);
   } 
 
+  
 
 
   // @Post('enviar-notificacion')
