@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Notificacion } from './entities/notificacion.entity';
 import { title } from 'process';
 import { AuthService } from 'src/auth/auth.service';
+import { DataNotificacionDto } from './dto/data-notificacion.dto';
 
 @Injectable()
 export class NotificacionService {
@@ -81,6 +82,22 @@ export class NotificacionService {
     }
    });
     return await webPush.sendNotification(pushSubscription, pushNotificacion);
+  }
+
+  async registrarProgramacionNotif( dataNotificacionDto:DataNotificacionDto, token:string){
+    try {
+      const id_usuario = await this.authService.obtenerTokenUsuario(token);
+  
+      const {ruta, hora, dia} = dataNotificacionDto;
+      
+      await this.notificacionRepository.query(
+        'call sp_registrar_programacion_notificacion(?,?,?,?)',
+        [ruta, hora, dia, id_usuario]
+      );
+      return { message: 'Se registro exitosamente la programacion de notificaciones del usuario'}
+    } catch (error) {
+      throw new BadRequestException('Error, '+ error.message)
+    }
   }
 
   // create(createNotificacionDto: CreateNotificacionDto) {

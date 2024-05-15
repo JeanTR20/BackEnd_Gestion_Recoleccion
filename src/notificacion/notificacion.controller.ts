@@ -46,7 +46,26 @@ export class NotificacionController {
    return this.notificacionService.enviarNotificaciones(id_usuario);
   } 
 
-  
+  @Post('registrar-notificacion')
+  @ApiHeader({
+    name:'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Registrar notificación',
+    description: 'Esta API permite registrar la ruta, fecha y hora para recibir las notificaciones, mediante el Query: {"ruta": "string","hora": "string","dia": "string"}, SP:sp_registrar_programacion_notificacion(?,?,?,?)'
+  })
+  registrarnotificacion( 
+    @Body() dataNotificacionDto: DataNotificacionDto,
+    @Headers('Authorization') headers: string
+
+  ){
+    const token = headers.split(' ')[1];
+    // console.log('token: ', token)
+    return this.notificacionService.registrarProgramacionNotif(dataNotificacionDto, token);
+  } 
+
+
 
 
   // @Post('enviar-notificacion')
