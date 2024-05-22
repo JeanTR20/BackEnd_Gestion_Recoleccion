@@ -8,6 +8,7 @@ import { Notificacion } from './entities/notificacion.entity';
 import { title } from 'process';
 import { AuthService } from 'src/auth/auth.service';
 import { DataNotificacionDto } from './dto/data-notificacion.dto';
+import { CronJob } from 'cron';
 
 @Injectable()
 export class NotificacionService {
@@ -26,97 +27,146 @@ export class NotificacionService {
     );
   }
 
-  async subscribe(subscription: any, token:string) {
-    try {
-      const id_usuario = await this.authService.obtenerTokenUsuario(token);
+  // async subscribe(subscription: any, token:string) {
+  //   try {
+  //     const id_usuario = await this.authService.obtenerTokenUsuario(token);
 
-      const [usuario_existente] = await this.notificacionRepository.query(
-        'SELECT COUNT(*) AS resultado FROM tbl_suscripcion_notificacion WHERE usuario_id = ?',
-        [id_usuario]
-      );
+  //     const [usuario_existente] = await this.notificacionRepository.query(
+  //       'SELECT COUNT(*) AS resultado FROM tbl_suscripcion_notificacion WHERE usuario_id = ?',
+  //       [id_usuario]
+  //     );
 
-      if(usuario_existente.resultado > 0){
-        throw new BadRequestException('el usuario ya esta registrado con una suscripción')
-      }
+  //     if(usuario_existente.resultado > 0){
+  //       throw new BadRequestException('el usuario ya esta registrado con una suscripción')
+  //     }
 
-      const {endpoint, keys: {p256dh, auth}} = subscription
+  //     const {endpoint, keys: {p256dh, auth}} = subscription
 
-      await this.notificacionRepository.query(
-        'call sp_registrar_suscripcion_notificacion(?,?,?,?)',
-        [endpoint, p256dh, auth, id_usuario]
-      );
+  //     await this.notificacionRepository.query(
+  //       'call sp_registrar_suscripcion_notificacion(?,?,?,?)',
+  //       [endpoint, p256dh, auth, id_usuario]
+  //     );
 
-      return {message: 'subscripcion guardada existosamente'}
+  //     return {message: 'subscripcion guardada existosamente'}
 
-    } catch (error) {
-      throw new BadRequestException('`Error al procesar la solicitud, ' + error.message)
-    }
-  }
+  //   } catch (error) {
+  //     throw new BadRequestException('`Error al procesar la solicitud, ' + error.message)
+  //   }
+  // }
 
-  async enviarNotificaciones(id_usuario: number) {
+  // async enviarNotificaciones(id_usuario: number) {
     
-    const [suscripcion] = await this.notificacionRepository.query(
-      'call sp_obtener_suscripcion_notificacion(?)',
+  //   const [suscripcion] = await this.notificacionRepository.query(
+  //     'call sp_obtener_suscripcion_notificacion(?)',
+  //     [id_usuario]
+  //   )
+
+  //   const pushSubscription = {
+  //     endpoint: suscripcion[0].suscripcion_endpoint,
+  //     keys: {
+  //       p256dh: suscripcion[0].suscripcion_p256dh,
+  //       auth: suscripcion[0].suscripcion_auth
+  //     }
+  //   };
+
+  //  const pushNotificacion = JSON.stringify({
+  //   notification: {
+  //     title: 'Municipalidad distrital de Huancán',
+  //     body: `Recuerda que el camión compactador de residuos sólidos pasara hoy por la`,
+  //     vibrate: [100, 50, 100],
+  //     icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
+  //     badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
+  //     actions: [{
+  //       action: '',
+  //       title: 'Cerrar'
+  //     }]
+  //   }
+  //  });
+  //   return await webPush.sendNotification(pushSubscription, pushNotificacion);
+  // }
+
+
+  async programarNotificacion(token: string, suscripcion: any, ruta: string, dia:string, hora: string){
+
+    const id_usuario = await this.authService.obtenerTokenUsuario(token);
+
+    console.log(token, suscripcion, ruta, dia, hora)
+
+    // const [usuario_existente] = await this.notificacionRepository.query(
+    //   'SELECT COUNT(*) AS resultado FROM tbl_suscripcion_notificacion WHERE usuario_id = ?',
+    //   [id_usuario]
+    // );
+
+    // if(usuario_existente.resultado > 0){
+    //   throw new BadRequestException('el usuario ya esta registrado con una suscripción')
+    // }
+
+    // const {endpoint, keys: {p256dh, auth}} = suscripcion
+
+    // await this.notificacionRepository.query(
+    //   'call sp_registrar_suscripcion_notificacion(?,?,?,?)',
+    //   [endpoint, p256dh, auth, id_usuario]
+    // );
+
+    const [usuario_existente] = await this.notificacionRepository.query(
+      'SELECT COUNT(*) AS resultado FROM tbl_programar_notificacion WHERE usuario_id = ?',
       [id_usuario]
-    )
+    );
 
-    const pushSubscription = {
-      endpoint: suscripcion[0].suscripcion_endpoint,
-      keys: {
-        p256dh: suscripcion[0].suscripcion_p256dh,
-        auth: suscripcion[0].suscripcion_auth
+    if(usuario_existente.resultado > 0){
+      throw new BadRequestException('el usuario ya esta registrado sus programacion de notificacion')
+    }
+
+    await this.notificacionRepository.query(
+      'call sp_registrar_programacion_notificacion(?,?,?,?)',
+      [ruta, hora, dia, id_usuario]
+    );
+
+
+    const [hour, minute] = hora.split(':').map(num => parseInt(num, 10));
+    const crontime = `${minute} ${hour} * * ${this.getDiaSemana(dia)}`;
+    console.log(`Scheduling job with crontime: ${crontime}`);
+
+    const job = new CronJob(crontime, async () =>{
+
+      const pushNotificacion = JSON.stringify({
+        notification: {
+          title: 'Municipalidad distrital de Huancán',
+          body: `Recuerda que el camión compactador de residuos sólidos de la ruta n° ${ruta} pasara hoy a las ${hora} programada`,
+          vibrate: [100, 50, 100],
+          icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
+          badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
+          actions: [{
+            action: '',
+            title: 'Cerrar'
+          }]
+        }
+      });
+
+      try {
+        const response = await webPush.sendNotification(suscripcion, pushNotificacion)
+        console.log('Notification sent:', response);
+      } catch (error) {
+        console.error('Error sending push notification', error);
+        throw new BadRequestException('Error al enviar la notificacion', error.message)
       }
-    };
+    });
 
-   const pushNotificacion = JSON.stringify({
-    notification: {
-      title: 'Municipalidad distrital de Huancán',
-      body: 'Notificación de recojo de residuos sólidos',
-      vibrate: [100, 50, 100],
-      icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
-      badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
-      actions: [{
-        action: '',
-        title: 'Cerrar'
-      }]
-    }
-   });
-    return await webPush.sendNotification(pushSubscription, pushNotificacion);
+    job.start();
   }
 
-  async registrarProgramacionNotif( dataNotificacionDto:DataNotificacionDto, token:string){
-    try {
-      const id_usuario = await this.authService.obtenerTokenUsuario(token);
-  
-      const {ruta, hora, dia} = dataNotificacionDto;
+  private getDiaSemana(dia: string): number | undefined{
+    const diasemana = {
+      'Domingo':0,
+      'Lunes': 1,
+      'Martes': 2,
+      'Miércoles': 3,
+      'Jueves': 4,
+      'Viernes':5,
+      'Sábado':6,
       
-      await this.notificacionRepository.query(
-        'call sp_registrar_programacion_notificacion(?,?,?,?)',
-        [ruta, hora, dia, id_usuario]
-      );
-      return { message: 'Se registro exitosamente la programacion de notificaciones del usuario'}
-    } catch (error) {
-      throw new BadRequestException('Error, '+ error.message)
-    }
-  }
+    };
+    return diasemana[dia]
+  } 
 
-  // create(createNotificacionDto: CreateNotificacionDto) {
-  //   return 'This action adds a new notificacion';
-  // }
-
-  // findAll() {
-  //   return `This action returns all notificacion`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} notificacion`;
-  // }
-
-  // update(id: number, updateNotificacionDto: UpdateNotificacionDto) {
-  //   return `This action updates a #${id} notificacion`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} notificacion`;
-  // }
 }
