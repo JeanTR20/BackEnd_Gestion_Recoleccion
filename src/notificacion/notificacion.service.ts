@@ -27,70 +27,9 @@ export class NotificacionService {
     );
   }
 
-  // async subscribe(subscription: any, token:string) {
-  //   try {
-  //     const id_usuario = await this.authService.obtenerTokenUsuario(token);
-
-  //     const [usuario_existente] = await this.notificacionRepository.query(
-  //       'SELECT COUNT(*) AS resultado FROM tbl_suscripcion_notificacion WHERE usuario_id = ?',
-  //       [id_usuario]
-  //     );
-
-  //     if(usuario_existente.resultado > 0){
-  //       throw new BadRequestException('el usuario ya esta registrado con una suscripción')
-  //     }
-
-  //     const {endpoint, keys: {p256dh, auth}} = subscription
-
-  //     await this.notificacionRepository.query(
-  //       'call sp_registrar_suscripcion_notificacion(?,?,?,?)',
-  //       [endpoint, p256dh, auth, id_usuario]
-  //     );
-
-  //     return {message: 'subscripcion guardada existosamente'}
-
-  //   } catch (error) {
-  //     throw new BadRequestException('`Error al procesar la solicitud, ' + error.message)
-  //   }
-  // }
-
-  // async enviarNotificaciones(id_usuario: number) {
-    
-  //   const [suscripcion] = await this.notificacionRepository.query(
-  //     'call sp_obtener_suscripcion_notificacion(?)',
-  //     [id_usuario]
-  //   )
-
-  //   const pushSubscription = {
-  //     endpoint: suscripcion[0].suscripcion_endpoint,
-  //     keys: {
-  //       p256dh: suscripcion[0].suscripcion_p256dh,
-  //       auth: suscripcion[0].suscripcion_auth
-  //     }
-  //   };
-
-  //  const pushNotificacion = JSON.stringify({
-  //   notification: {
-  //     title: 'Municipalidad distrital de Huancán',
-  //     body: `Recuerda que el camión compactador de residuos sólidos pasara hoy por la`,
-  //     vibrate: [100, 50, 100],
-  //     icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
-  //     badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
-  //     actions: [{
-  //       action: '',
-  //       title: 'Cerrar'
-  //     }]
-  //   }
-  //  });
-  //   return await webPush.sendNotification(pushSubscription, pushNotificacion);
-  // }
-
-
   async programarNotificacion(token: string, suscripcion: any, ruta: string, dia:string, hora: string){
 
     const id_usuario = await this.authService.obtenerTokenUsuario(token);
-
-    console.log(token, suscripcion, ruta, dia, hora)
 
     // const [usuario_existente] = await this.notificacionRepository.query(
     //   'SELECT COUNT(*) AS resultado FROM tbl_suscripcion_notificacion WHERE usuario_id = ?',
@@ -108,15 +47,6 @@ export class NotificacionService {
     //   [endpoint, p256dh, auth, id_usuario]
     // );
 
-    const [usuario_existente] = await this.notificacionRepository.query(
-      'SELECT COUNT(*) AS resultado FROM tbl_programar_notificacion WHERE usuario_id = ?',
-      [id_usuario]
-    );
-
-    if(usuario_existente.resultado > 0){
-      throw new BadRequestException('el usuario ya esta registrado sus programacion de notificacion')
-    }
-
     await this.notificacionRepository.query(
       'call sp_registrar_programacion_notificacion(?,?,?,?)',
       [ruta, hora, dia, id_usuario]
@@ -132,7 +62,7 @@ export class NotificacionService {
       const pushNotificacion = JSON.stringify({
         notification: {
           title: 'Municipalidad distrital de Huancán',
-          body: `Recuerda que el camión compactador de residuos sólidos de la ruta n° ${ruta} pasara hoy a las ${hora} programada`,
+          body: `Recuerda que el camión compactador de residuos sólidos de la ruta n° ${ruta} pasara hoy a las ${hora} programada, el id: ${id_usuario}`,
           vibrate: [100, 50, 100],
           icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
           badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
@@ -167,6 +97,6 @@ export class NotificacionService {
       
     };
     return diasemana[dia]
-  } 
+  }
 
 }
