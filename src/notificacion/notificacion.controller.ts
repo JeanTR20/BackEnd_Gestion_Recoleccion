@@ -19,7 +19,7 @@ export class NotificacionController {
   })
   @ApiOperation({
     summary: 'Enviar notificación',
-    description: 'Esta API permite envia las notificaciones a los residentes suscrito, mediante los Parametro: {"id_usuario": "number"}, SP:sp_obtener_suscripcion_notificacion(?)'
+    description: 'Esta API permite envia las notificaciones a los residentes que hayan iniciado sesión, mediante los Parametro: {"id_usuario": "number"}, SP:sp_obtener_suscripcion_notificacion(?)'
   })
   enviarnotificacion(
     @Headers('Authorization') headers: string, 
@@ -35,6 +35,34 @@ export class NotificacionController {
     return this.notificacionService.programarNotificacion(token, suscripcion, ruta, dia, hora);
   } 
 
+
+  @Post('cancelar-notificacion/:id_usuario')
+  @ApiHeader({
+    name:'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Cancelar notificación',
+    description: 'Esta API permite cancelar las notificaciones a los residentes que hayan iniciado sesión, mediante los Parametro: {"id_usuario": "number"}'
+  })
+  cancelarnotificacion(
+    @Param('id_usuario') id_usuario: number 
+  ){
+    return this.notificacionService.cancelarNotificacion(id_usuario);
+  }
+
+  @Get('obtener-notificacion/:token')
+  @ApiHeader({
+    name:'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'obtener datos de notificación',
+    description: 'Esta API permite obtener datos de notificación programada de los residentes, mediante los Parametro: {"id_usuario": "number"}'
+  })
+  obtenernotificacion(@Param('token') token: string){
+    return this.notificacionService.obtenerDatoNotificacion(token)
+  }
 
   // @Post()
   // create(@Body() createNotificacionDto: CreateNotificacionDto) {

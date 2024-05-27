@@ -12,6 +12,9 @@ import { CronJob } from 'cron';
 
 @Injectable()
 export class NotificacionService {
+
+  private cronJobMap = new Map<number, CronJob>();
+
   constructor(
 
     private readonly authService: AuthService,
@@ -52,9 +55,15 @@ export class NotificacionService {
       [ruta, hora, dia, id_usuario]
     );
 
+    const [programar] = await this.notificacionRepository.query(
+      'call sp_obtener_programacion_notificacion(?)', [id_usuario]
+    );
 
-    const [hour, minute] = hora.split(':').map(num => parseInt(num, 10));
-    const crontime = `${minute} ${hour} * * ${this.getDiaSemana(dia)}`;
+    // console.log(programar[0].programar_hora)
+    // console.log(programar[0].programar_dia)
+
+    const [hour, minute] = programar[0].programar_hora.split(':').map(num => parseInt(num, 10));
+    const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar[0].programar_dia)}`;
     console.log(`Scheduling job with crontime: ${crontime}`);
 
     const job = new CronJob(crontime, async () =>{
@@ -62,7 +71,7 @@ export class NotificacionService {
       const pushNotificacion = JSON.stringify({
         notification: {
           title: 'Municipalidad distrital de Huancán',
-          body: `Recuerda que el camión compactador de residuos sólidos de la ruta n° ${ruta} pasara hoy a las ${hora} programada, el id: ${id_usuario}`,
+          body: `Recuerda que el camión compactador de residuos sólidos de la ruta n° ${programar[0].programar_ruta} pasara hoy a las ${hour}:${minute} programada, el id: ${id_usuario}`,
           vibrate: [100, 50, 100],
           icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
           badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
@@ -82,6 +91,7 @@ export class NotificacionService {
       }
     });
 
+    this.cronJobMap.set(id_usuario, job);
     job.start();
   }
 
@@ -99,4 +109,27 @@ export class NotificacionService {
     return diasemana[dia]
   }
 
+  async obtenerDatoNotificacion(token: string){
+    try {
+      const id_usuario = await this.authService.obtenerTokenUsuario(token);
+
+      const [datonotificacion] = await this.notificacionRepository.query(
+        'call sp_obtener_programacion_notificacion(?)', [id_usuario]
+      );
+      return datonotificacion
+    } catch (error) {
+      throw new BadRequestException('Error ,' + error.message)
+    }
+  }
+
+  async cancelarNotificacion(id_usuario: number){
+    const job = this.cronJobMap.get(id_usuario);
+    if(job) {
+      job.stop();
+      this.cronJobMap.delete(id_usuario);
+      console.log(`notificacion para el id_usuario ${id_usuario} ha sido cancelado`);
+    }else{
+      console.log(`no se encontro Cronjob para el usuario ${id_usuario}`)
+    }
+  } 
 }
