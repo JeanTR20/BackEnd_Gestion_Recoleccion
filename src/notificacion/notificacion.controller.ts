@@ -28,10 +28,6 @@ export class NotificacionController {
 
     const token = headers.split(' ')[1];
     const {ruta, dia, hora, suscripcion} = body
-
-    if (!ruta || !dia || !hora || !suscripcion) {
-      throw new BadRequestException('Faltan campos requeridos');
-    }
     return this.notificacionService.programarNotificacion(token, suscripcion, ruta, dia, hora);
   } 
 

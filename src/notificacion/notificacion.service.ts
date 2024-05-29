@@ -32,6 +32,10 @@ export class NotificacionService {
 
   async programarNotificacion(token: string, suscripcion: any, ruta: string, dia:string, hora: string){
 
+    if(!token){
+      throw new BadRequestException('Necesitas iniciar sesión para realizar esta acción backend')
+    }
+
     const id_usuario = await this.authService.obtenerTokenUsuario(token);
 
     // const [usuario_existente] = await this.notificacionRepository.query(
@@ -50,6 +54,10 @@ export class NotificacionService {
     //   [endpoint, p256dh, auth, id_usuario]
     // );
 
+    if (!ruta || !dia || !hora) {
+      throw new BadRequestException('Faltan campos requeridos');
+    }
+
     await this.notificacionRepository.query(
       'call sp_registrar_programacion_notificacion(?,?,?,?)',
       [ruta, hora, dia, id_usuario]
@@ -58,10 +66,7 @@ export class NotificacionService {
     const [programar] = await this.notificacionRepository.query(
       'call sp_obtener_programacion_notificacion(?)', [id_usuario]
     );
-
-    // console.log(programar[0].programar_hora)
-    // console.log(programar[0].programar_dia)
-
+    
     const [hour, minute] = programar[0].programar_hora.split(':').map(num => parseInt(num, 10));
     const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar[0].programar_dia)}`;
     console.log(`Scheduling job with crontime: ${crontime}`);
@@ -71,7 +76,7 @@ export class NotificacionService {
       const pushNotificacion = JSON.stringify({
         notification: {
           title: 'Municipalidad distrital de Huancán',
-          body: `Recuerda que el camión compactador de residuos sólidos de la ruta n° ${programar[0].programar_ruta} pasara hoy a las ${hour}:${minute} programada, el id: ${id_usuario}`,
+          body: `Recuerda que el camión compactador de residuos sólidos de la ruta n° ${programar[0].programar_ruta} pasara hoy a las ${hour}:${minute} programada`,
           vibrate: [100, 50, 100],
           icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
           badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
