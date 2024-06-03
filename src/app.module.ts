@@ -13,6 +13,8 @@ import { PassportModule } from '@nestjs/passport';
 import { AdminHorarioModule } from './admin_horario/admin_horario.module';
 import { AdminPersonalModule } from './admin_personal/admin_personal.module';
 import { NotificacionModule } from './notificacion/notificacion.module';
+import { EventsGateway } from './events/events.gateway';
+import { EventsModule } from './events/events.module';
 
 
 @Module({
@@ -63,10 +65,11 @@ import { NotificacionModule } from './notificacion/notificacion.module';
     PassportModule,
     AdminHorarioModule,
     AdminPersonalModule,
-    NotificacionModule
+    NotificacionModule,
+    EventsModule
     //poner todos los modulos del la carpeta creada
   ],
   controllers: [],
-  providers: [],
+  providers: [EventsGateway],
 })
 export class AppModule {}

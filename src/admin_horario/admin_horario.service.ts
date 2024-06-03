@@ -5,24 +5,28 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AdminHorario } from './entities/admin_horario.entity';
 import { Repository } from 'typeorm';
 import { ListAdminHorarioDto } from './dto/list-admin-horario.dto';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class AdminHorarioService {
 
   constructor(
+    private readonly eventsGateway: EventsGateway,
     @InjectRepository(AdminHorario) 
-    private readonly adminHorarioRepository: Repository<AdminHorario> 
+    private readonly adminHorarioRepository: Repository<AdminHorario>
+    
   ){}
 
   async crearHorario(createAdminHorarioDto: CreateAdminHorarioDto){
     try {
       const {dia, hora_inicio, recorrido, referencia_punto, ruta_id} = createAdminHorarioDto
       
-      await this.adminHorarioRepository.query(
+      const createhorario = await this.adminHorarioRepository.query(
         'call sp_admin_crear_horario(?,?,?,?,?)', 
         [dia, hora_inicio, recorrido, referencia_punto, ruta_id]
       );
 
+      this.eventsGateway.notificacionDetectarModificacionHorario({ action: 'create', schedule: createhorario, message:`El horario de la ruta n° ${ruta_id} ha sido modificado`});
       return { message: 'se creo existosamente un nuevo horario'}
 
     } catch (error) {
@@ -33,10 +37,11 @@ export class AdminHorarioService {
   async actualizarHorario(id_horario, updateAdminHorarioDto: UpdateAdminHorarioDto){
     try {
       const {dia, hora_inicio, recorrido, referencia_punto, ruta_id}= updateAdminHorarioDto;
-      await this.adminHorarioRepository.query(
+      const updatehorario = await this.adminHorarioRepository.query(
         'Call sp_admin_actualizar_horario(?,?,?,?,?,?)',
         [id_horario, dia, hora_inicio, recorrido, referencia_punto, ruta_id]
       );
+      this.eventsGateway.notificacionDetectarModificacionHorario({ action: 'update', schedule: updatehorario, message:`El horario de la ruta n° ${ruta_id} ha sido modificado`});
       return{
         message: 'Se actualizó exitamente'
       }
@@ -50,6 +55,7 @@ export class AdminHorarioService {
       await this.adminHorarioRepository.query(
         'call sp_admin_eliminar_horario(?)', [id_horario]
       );
+      this.eventsGateway.notificacionDetectarModificacionHorario({ action: 'delete', scheduleId: id_horario, message:`El horario con el ID: ${id_horario} ha sido eliminado`});
       return {
         message: 'Se elimino un registro de la tabla horario'
       }
