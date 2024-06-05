@@ -38,15 +38,6 @@ export class NotificacionService {
 
     const id_usuario = await this.authService.obtenerTokenUsuario(token);
 
-    const [usuario_activo] = await this.notificacionRepository.query(
-      'SELECT COUNT(*) AS resultado FROM tbl_usuario WHERE id_usuario = ? AND usuario_estado = 1',
-      [id_usuario]
-    )
-
-    if(usuario_activo.resultado === 0){
-      throw new BadRequestException('el usuario esta de baja')
-    }
-
     if (!ruta || !dia || !hora) {
       throw new BadRequestException('Faltan campos requeridos');
     }
@@ -56,6 +47,15 @@ export class NotificacionService {
       [ruta, hora, dia, id_usuario]
     );
 
+    const [usuario_activo] = await this.notificacionRepository.query(
+      'SELECT COUNT(*) AS resultado FROM tbl_usuario WHERE id_usuario = ? AND usuario_estado = 1',
+      [id_usuario]
+    )
+
+    if(usuario_activo.resultado === 0){
+      throw new BadRequestException('el usuario esta de baja')
+    }
+    
     const [programar] = await this.notificacionRepository.query(
       'call sp_obtener_programacion_notificacion(?)', [id_usuario]
     );
