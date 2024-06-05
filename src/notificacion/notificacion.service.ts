@@ -38,21 +38,14 @@ export class NotificacionService {
 
     const id_usuario = await this.authService.obtenerTokenUsuario(token);
 
-    // const [usuario_existente] = await this.notificacionRepository.query(
-    //   'SELECT COUNT(*) AS resultado FROM tbl_suscripcion_notificacion WHERE usuario_id = ?',
-    //   [id_usuario]
-    // );
+    const [usuario_activo] = await this.notificacionRepository.query(
+      'SELECT COUNT(*) AS resultado FROM tbl_usuario WHERE id_usuario = ? AND usuario_estado = 1',
+      [id_usuario]
+    )
 
-    // if(usuario_existente.resultado > 0){
-    //   throw new BadRequestException('el usuario ya esta registrado con una suscripción')
-    // }
-
-    // const {endpoint, keys: {p256dh, auth}} = suscripcion
-
-    // await this.notificacionRepository.query(
-    //   'call sp_registrar_suscripcion_notificacion(?,?,?,?)',
-    //   [endpoint, p256dh, auth, id_usuario]
-    // );
+    if(usuario_activo.resultado === 0){
+      throw new BadRequestException('el usuario esta de baja')
+    }
 
     if (!ruta || !dia || !hora) {
       throw new BadRequestException('Faltan campos requeridos');
