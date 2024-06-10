@@ -1,4 +1,4 @@
-import { BadRequestException, Get, Injectable, Query } from '@nestjs/common';
+import { BadRequestException, Get, Injectable, NotFoundException, Query } from '@nestjs/common';
 import { CreateAdminHorarioDto } from './dto/create-admin_horario.dto';
 import { UpdateAdminHorarioDto } from './dto/update-admin_horario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,13 +20,23 @@ export class AdminHorarioService {
   async crearHorario(createAdminHorarioDto: CreateAdminHorarioDto){
     try {
       const {dia, hora_inicio, recorrido, referencia_punto, ruta_id} = createAdminHorarioDto
-      
+
+      let formatTime = hora_inicio.toLocaleTimeString('es-PE', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+
       const createhorario = await this.adminHorarioRepository.query(
         'call sp_admin_crear_horario(?,?,?,?,?)', 
         [dia, hora_inicio, recorrido, referencia_punto, ruta_id]
       );
 
-      this.eventsGateway.notificacionDetectarModificacionHorario({ action: 'create', schedule: createhorario, message:`El horario de la ruta n° ${ruta_id} ha sido modificado`});
+      this.eventsGateway.notificacionDetectarModificacionHorario({ 
+        action: 'create', 
+        schedule: createhorario, 
+        message:`Se ha creado un nuevo horario para la ruta N° ${ruta_id} del día ${dia}, con un recorrido ${recorrido} que hace el camión compactador de recojo de basura a las ${formatTime}.`
+      });
       return { message: 'se creo existosamente un nuevo horario'}
 
     } catch (error) {
@@ -37,14 +47,43 @@ export class AdminHorarioService {
   async actualizarHorario(id_horario, updateAdminHorarioDto: UpdateAdminHorarioDto){
     try {
       const {dia, hora_inicio, recorrido, referencia_punto, ruta_id}= updateAdminHorarioDto;
+
+      const [horarioActual] = await this.adminHorarioRepository.query(
+        'SELECT * FROM tbl_horario_punto WHERE horariopunto_id = ?',
+        [id_horario]
+      );
+
+      console.log(horarioActual)
+
+      if(!horarioActual){
+        throw new NotFoundException(`El horario con ID ${id_horario} no existe.`)
+      }
+
+       let formattedTime = hora_inicio.toLocaleTimeString('es-PE', {
+           hour: '2-digit',
+           minute: '2-digit',
+           hour12: true
+       });
+
       const updatehorario = await this.adminHorarioRepository.query(
         'Call sp_admin_actualizar_horario(?,?,?,?,?,?)',
         [id_horario, dia, hora_inicio, recorrido, referencia_punto, ruta_id]
       );
-      this.eventsGateway.notificacionDetectarModificacionHorario({ action: 'update', schedule: updatehorario, message:`El horario de la ruta n° ${ruta_id} ha sido modificado`});
-      return{
-        message: 'Se actualizó exitamente'
-      }
+
+      let mensaje = `Detalle del cambio de horario:
+  - Ruta: ${ruta_id}
+  - Dia: ${dia}
+  - Hora de inicio: ${formattedTime}
+  - Recorrido: ${recorrido}`;
+
+      this.eventsGateway.notificacionDetectarModificacionHorario({ 
+        action: 'update', 
+        schedule: updatehorario, 
+        message: mensaje,
+      });
+
+      return{ message: 'Se actualizó exitamente' }
+     
     } catch (error) {
       throw new BadRequestException('Error, ' + error.message)
     }
@@ -52,13 +91,26 @@ export class AdminHorarioService {
 
   async deleteHorario(id_horario: number){
     try {
+
+      const [horario] = await this.adminHorarioRepository.query(
+        'SELECT * FROM tbl_horario_punto WHERE horariopunto_id = ?',
+        [id_horario]
+      );
+
       await this.adminHorarioRepository.query(
         'call sp_admin_eliminar_horario(?)', [id_horario]
       );
-      this.eventsGateway.notificacionDetectarModificacionHorario({ action: 'delete', scheduleId: id_horario, message:`El horario con el ID: ${id_horario} ha sido eliminado`});
+
+      this.eventsGateway.notificacionDetectarModificacionHorario({ 
+        action: 'delete', 
+        scheduleId: id_horario, 
+        message:`El horario de la ruta N° ${horario.ruta_id}, el dia ${horario.horariopunto_dia}, en la hora ${horario.horariopunto_hora_inicio} del recorrido ${horario.horariopunto_recorrido} ha sido eliminado.`
+      });
+
       return {
         message: 'Se elimino un registro de la tabla horario'
       }
+
     } catch (error) {
       throw new BadRequestException('Error ', error.message)
     }
