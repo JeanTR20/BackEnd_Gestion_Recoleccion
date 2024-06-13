@@ -28,16 +28,16 @@ export class AuthService {
     private readonly mailerService: MailerService
   ){}
 
-  async login({correo_usuario, contrasena}: LoginAuthDto){
+  async login({dni_usuario, contrasena}: LoginAuthDto){
     try {
 
       const [usuario] = await this.authRepository.query(
-        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_correo = ? OR usuario_nombre_usuario = ?',
-        [correo_usuario, correo_usuario]
+        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_nombre_usuario = ?',
+        [dni_usuario, dni_usuario]
       );
 
       if(!usuario){
-        throw new UnauthorizedException('No es valido el correo o el nombre de usuario')
+        throw new UnauthorizedException('No es valido el DNI o el nombre de usuario')
       }
 
       const passHash = usuario.usuario_contrasena;
@@ -49,7 +49,7 @@ export class AuthService {
       if(isValidPassHash){
         const [user] = await this.authRepository.query(
           'call sp_iniciar_sesion(?,?)',
-          [correo_usuario, passHash]
+          [dni_usuario, passHash]
         );
   
         const payload = { 
@@ -73,7 +73,7 @@ export class AuthService {
           token: token
         }
       }else{
-        throw new UnauthorizedException('No es valido la contrasena');
+        throw new UnauthorizedException('No es valido la contraseña');
       }
 
     } catch (error) {

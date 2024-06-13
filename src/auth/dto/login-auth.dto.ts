@@ -4,7 +4,7 @@ export class LoginAuthDto{
     
     @IsString({message: 'La variable correo debe ser de tipo string'})
     @IsNotEmpty({message: 'La variable correo_usuario no debe estar vacio'})
-    correo_usuario: string;
+    dni_usuario: string;
 
     @IsString()
     @MinLength(5, {message: 'La variable contraseña no debe ser menor a 5 caracteres'})
