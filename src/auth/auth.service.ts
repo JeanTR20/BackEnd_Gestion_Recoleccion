@@ -127,29 +127,34 @@ export class AuthService {
   async crearUsuario(createUserAuhtDto: CreateUserAuhtDto){
     try {
 
-      const {correo, nombre_usuario} = createUserAuhtDto;
+      const {dni, correo, nombre_usuario} = createUserAuhtDto;
 
-      const validarCorreoUsuario = await this.authRepository.query(
-        'SELECT usuario_correo, usuario_nombre_usuario FROM tbl_usuario WHERE usuario_correo = ? OR usuario_nombre_usuario = ?',
-        [correo, nombre_usuario]
+      const validarDniCorreoUsuario = await this.authRepository.query(
+        'SELECT usuario_carnet_identidad, usuario_correo, usuario_nombre_usuario FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_nombre_usuario = ? OR usuario_correo = ? ',
+        [dni, nombre_usuario, correo]
       )
       
-      if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo && usuario.usuario_nombre_usuario === nombre_usuario )){
-        throw new BadRequestException('El correo y el nombre de usuario ya existe')
+      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni && usuario.usuario_nombre_usuario === nombre_usuario && usuario.usuario_correo === correo)){
+        throw new BadRequestException('el dni, correo y el nombre de usuario ya existe')
       }
 
-      if(validarCorreoUsuario.some(usuario => usuario.usuario_nombre_usuario === nombre_usuario )){
-        throw new BadRequestException('El nombre de usuario ya existe')
+      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni)){
+        throw new BadRequestException('el dni ya existe')
       }
 
-      if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
-        throw new BadRequestException('El correo ya existe')
+      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_nombre_usuario === nombre_usuario)){
+        throw new BadRequestException('el nombre de usuario ya existe')
+      }
+
+      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
+        throw new BadRequestException('el correo ya existe')
       }
 
       const passHashed = await bcryptjs.hash(createUserAuhtDto.contrasena, 10);
 
       await this.authRepository.query(
-        'call sp_registrar_usuario_residente(?,?,?,@id_usuario)', [
+        'call sp_registrar_usuario_residente(?,?,?,?,@id_usuario)', [
+          createUserAuhtDto.dni,
           createUserAuhtDto.nombre_usuario,
           createUserAuhtDto.correo,
           passHashed,
