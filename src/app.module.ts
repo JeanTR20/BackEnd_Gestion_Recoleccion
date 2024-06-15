@@ -15,6 +15,7 @@ import { AdminPersonalModule } from './admin_personal/admin_personal.module';
 import { NotificacionModule } from './notificacion/notificacion.module';
 import { EventsGateway } from './events/events.gateway';
 import { EventsModule } from './events/events.module';
+import { AdminResidenteModule } from './admin_residente/admin_residente.module';
 
 
 @Module({
@@ -66,7 +67,8 @@ import { EventsModule } from './events/events.module';
     AdminHorarioModule,
     AdminPersonalModule,
     NotificacionModule,
-    EventsModule
+    EventsModule,
+    AdminResidenteModule
     //poner todos los modulos del la carpeta creada
   ],
   controllers: [],
