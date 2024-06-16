@@ -7,12 +7,14 @@ import { Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
 import { UpdateAdminHorarioDto } from 'src/admin_horario/dto/update-admin_horario.dto';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class ReporteIncidenciaService {
 
   constructor(
     private readonly authService: AuthService,
+    private readonly eventsGateway: EventsGateway,
     @InjectRepository(ReporteIncidencia) 
     private readonly reporteIncidenciaRepository: Repository<ReporteIncidencia>
     
@@ -59,9 +61,24 @@ export class ReporteIncidenciaService {
 
   async actualizarEstado(id_incidencia: number, {estado}: UpdateReporteIncidenciaDto){
     try {
-      await this.reporteIncidenciaRepository.query(
+
+      const [id_usuario] = await this.reporteIncidenciaRepository.query(
+        'SELECT usuario_id FROM tbl_incidencia_reporte WHERE incidencia_id = ?',
+        [id_incidencia]
+      )
+
+      const actualizarEstado = await this.reporteIncidenciaRepository.query(
         'call sp_admin_actualizar_estado_incidencia(?,?)', [id_incidencia, estado]
       );
+      
+      this.eventsGateway.notificacionDetectarModificacionHorario({ 
+        action: 'update', 
+        schedule: actualizarEstado, 
+        message: 'Tu reporte de incidencia ha sido culminado',
+        userId: id_usuario,
+        estado: estado
+      });
+
       return {
         message: 'Se actualizo la estado de la incidencia exitosamente'
       }

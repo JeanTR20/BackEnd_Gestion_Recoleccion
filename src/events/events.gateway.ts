@@ -9,4 +9,9 @@ export class EventsGateway {
   public notificacionDetectarModificacionHorario(detectadoCambioHorario: any): void{
     this.server.emit('cambioHorarioDetectado', detectadoCambioHorario);
   }
+
+  public notificacionDetectarEstadoCulminadoReporte(detectadoEstadoReporte: any):void{
+    this.server.emit('detectadoEstadoCulminadoReporte', detectadoEstadoReporte);
+  }
+
 }
