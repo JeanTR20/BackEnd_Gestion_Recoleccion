@@ -26,11 +26,18 @@ export class ReporteIncidenciaService {
 
       const id_usuario = await this.authService.obtenerTokenUsuario(token_usuario)
 
-      await this.reporteIncidenciaRepository.query(
+      const registroIncidencia= await this.reporteIncidenciaRepository.query(
         'call sp_registrar_incidencia_reporte(?,?,?,?,?,?)', 
         [descripcion, direccion, referencia_calle, fecha_reporte, foto, id_usuario ]
       );
-      
+
+      this.eventsGateway.notificacionDetectarRegistroIncidencia({ 
+        action: 'create', 
+        schedule: registroIncidencia, 
+        message: 'Hay un nuevo registro de incidencia, por favor revisarlo.',
+        userId: id_usuario,
+      });
+
       return {message: 'Se registro el reporte de incidencia de residuos solido exitosamente'}
     } catch (error) {
       throw new BadRequestException('Erro al registrar, ' + error.message)
@@ -70,8 +77,8 @@ export class ReporteIncidenciaService {
       const actualizarEstado = await this.reporteIncidenciaRepository.query(
         'call sp_admin_actualizar_estado_incidencia(?,?)', [id_incidencia, estado]
       );
-      
-      this.eventsGateway.notificacionDetectarModificacionHorario({ 
+
+      this.eventsGateway.notificacionDetectarEstadoCulminadoReporte({ 
         action: 'update', 
         schedule: actualizarEstado, 
         message: 'Tu reporte de incidencia ha sido culminado',
