@@ -31,19 +31,17 @@ export class ReporteIncidenciaService {
         [descripcion, direccion, referencia_calle, fecha_reporte, foto, id_usuario ]
       );
 
-      this.eventsGateway.notificacionDetectarRegistroIncidencia({ 
-        action: 'create', 
-        schedule: registroIncidencia, 
-        message: 'Hay un nuevo registro de incidencia, por favor revisarlo.',
-        userId: id_usuario,
-      });
+      // this.eventsGateway.notificacionDetectarRegistroIncidencia({ 
+      //   action: 'create', 
+      //   schedule: registroIncidencia, 
+      //   message: 'Hay un nuevo registro de incidencia, por favor revisarlo.',
+      // });
 
       return {message: 'Se registro el reporte de incidencia de residuos solido exitosamente'}
     } catch (error) {
       throw new BadRequestException('Erro al registrar, ' + error.message)
     }
   }
-
 
   
   // api para administrador

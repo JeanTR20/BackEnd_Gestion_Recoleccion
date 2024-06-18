@@ -14,7 +14,7 @@ export class EventsGateway {
     this.server.emit('detectadoEstadoCulminadoReporte', detectadoEstadoReporte);
   }
 
-  public notificacionDetectarRegistroIncidencia(detectadoRegistroIncidencia: any):void{
-    this.server.emit('detectadoReporteIncidencia', detectadoRegistroIncidencia);
-  }
+  // public notificacionDetectarRegistroIncidencia(detectadoRegistroIncidencia: any):void{
+  //   this.server.emit('detectadoReporteIncidencia', detectadoRegistroIncidencia);
+  // }
 }
