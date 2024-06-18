@@ -168,7 +168,7 @@ export class AuthService {
       return id_usuario;
 
     } catch (error) {
-      throw new InternalServerErrorException('Error al registrar el usuario, ' + error.message)
+      throw new BadRequestException('Error al registrar el usuario, ' + error.message)
     }
   }
 
