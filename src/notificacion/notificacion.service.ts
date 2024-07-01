@@ -42,6 +42,8 @@ export class NotificacionService {
       throw new BadRequestException('Faltan campos requeridos');
     }
 
+    console.log('suscripcion:', suscripcion);
+
     await this.notificacionRepository.query(
       'call sp_registrar_programacion_notificacion(?,?,?,?)',
       [ruta, hora, dia, id_usuario]
@@ -78,7 +80,7 @@ export class NotificacionService {
         console.error('Error sending push notification', error);
         throw new BadRequestException('Error al enviar la notificacion', error.message)
       }
-    });
+    }, null, true, 'America/Lima');
 
     this.cronJobMap.set(id_usuario, job);
     job.start();
