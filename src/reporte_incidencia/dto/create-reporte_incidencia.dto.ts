@@ -15,9 +15,9 @@ export class CreateReporteIncidenciaDto {
     @IsNotEmpty({message: 'La variable referencia_calle no debe estar vacio'})
     referencia_calle: string;
     
-    @IsString({message: 'La variable fecha_reporte deber ser de tipo string'})
-    @IsNotEmpty({message: 'La variable fecha_reporte no debe estar vacio'})
-    fecha_reporte: string;
+    // @IsString({message: 'La variable fecha_reporte deber ser de tipo string'})
+    // @IsNotEmpty({message: 'La variable fecha_reporte no debe estar vacio'})
+    // fecha_reporte: string;
     
     @IsString({message: 'La variable foto debe ser de tipo string'})
     @IsNotEmpty({message: 'La variable foto no debe estar vacio'})

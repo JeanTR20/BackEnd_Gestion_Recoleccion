@@ -20,5 +20,4 @@ export class CreateUserAuhtDto{
     @IsNotEmpty({message: 'La variable contrasena no debe estar vacio'})
     @Length(8, 255, {message: 'La variable contrasena debe tener de 5 a 255 caracteres'})
     contrasena: string;
-
 }

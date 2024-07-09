@@ -22,13 +22,13 @@ export class ReporteIncidenciaService {
 
   async registrarReporteIncidencia(createReporteIncidenciaDto: CreateReporteIncidenciaDto){
     try {
-      const {descripcion, direccion, referencia_calle, fecha_reporte, foto, token_usuario} = createReporteIncidenciaDto
+      const {descripcion, direccion, referencia_calle, foto, token_usuario} = createReporteIncidenciaDto
 
       const id_usuario = await this.authService.obtenerTokenUsuario(token_usuario)
 
-      const registroIncidencia= await this.reporteIncidenciaRepository.query(
-        'call sp_registrar_incidencia_reporte(?,?,?,?,?,?)', 
-        [descripcion, direccion, referencia_calle, fecha_reporte, foto, id_usuario ]
+      const registroIncidencia = await this.reporteIncidenciaRepository.query(
+        'call sp_registrar_incidencia_reporte(?,?,?,?,?)', 
+        [descripcion, direccion, referencia_calle, foto, id_usuario ]
       );
 
       // this.eventsGateway.notificacionDetectarRegistroIncidencia({ 
