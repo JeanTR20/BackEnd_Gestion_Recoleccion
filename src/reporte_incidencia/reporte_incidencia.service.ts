@@ -80,9 +80,9 @@ export class ReporteIncidenciaService {
         action: 'update', 
         schedule: actualizarEstado, 
         message: 'Tu reporte de incidencia ha sido culminado',
-        userId: id_usuario,
+        userId: id_usuario.usuario_id,
         estado: estado
-      });
+      }, id_usuario.usuario_id);
 
       return {
         message: 'Se actualizo la estado de la incidencia exitosamente'
