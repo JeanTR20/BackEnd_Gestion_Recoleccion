@@ -66,6 +66,7 @@ export class AuthService {
             usuario_apellido_paterno: usuario.usuario_apellido_paterno,
             usuario_apellido_materno: usuario.usuario_apellido_materno,
             usuario_nombre: usuario.usuario_nombre_usuario,
+            usuario_telefono: usuario.usuario_telefono,
             usuario_correo: usuario.usuario_correo,
             usuario_estado: usuario.usuario_estado,
             rol_nombre: user[0].rol_nombre
@@ -116,6 +117,7 @@ export class AuthService {
         usuario_nombre_completo: datos[0].usuario_nombre_completo,
         usuario_apellido_paterno: datos[0].usuario_apellido_paterno,
         usuario_apellido_materno: datos[0].usuario_apellido_materno,
+        usuario_telefono: datos[0].usuario_telefono,
         usuario_correo: datos[0].usuario_correo,
         usuario_estado: datos[0].usuario_estado,
         rol_nombre: datos[0].rol_nombre
@@ -127,15 +129,15 @@ export class AuthService {
   async crearUsuario(createUserAuhtDto: CreateUserAuhtDto){
     try {
 
-      const {dni, correo, nombre_usuario} = createUserAuhtDto;
+      const {dni, telefono, nombre_usuario} = createUserAuhtDto;
 
       const validarDniCorreoUsuario = await this.authRepository.query(
-        'SELECT usuario_carnet_identidad, usuario_correo, usuario_nombre_usuario FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_nombre_usuario = ? OR usuario_correo = ? ',
-        [dni, nombre_usuario, correo]
+        'SELECT usuario_carnet_identidad, usuario_telefono, usuario_nombre_usuario FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_nombre_usuario = ? OR usuario_telefono = ? ',
+        [dni, nombre_usuario, telefono]
       )
       
-      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni && usuario.usuario_nombre_usuario === nombre_usuario && usuario.usuario_correo === correo)){
-        throw new BadRequestException('el dni, correo y el nombre de usuario ya existe')
+      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni && usuario.usuario_nombre_usuario === nombre_usuario && usuario.usuario_telefono === telefono)){
+        throw new BadRequestException('el dni, número celular y nombre de usuario ya existe')
       }
 
       if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni)){
@@ -146,8 +148,8 @@ export class AuthService {
         throw new BadRequestException('el nombre de usuario ya existe')
       }
 
-      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
-        throw new BadRequestException('el correo ya existe')
+      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_telefono === telefono )){
+        throw new BadRequestException('el número de celular ya existe')
       }
 
       const passHashed = await bcryptjs.hash(createUserAuhtDto.contrasena, 10);
@@ -156,7 +158,7 @@ export class AuthService {
         'call sp_registrar_usuario_residente(?,?,?,?,@id_usuario)', [
           createUserAuhtDto.dni,
           createUserAuhtDto.nombre_usuario,
-          createUserAuhtDto.correo,
+          createUserAuhtDto.telefono,
           passHashed,
         ]
       );
