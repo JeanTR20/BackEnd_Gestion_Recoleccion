@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as csurf from 'csurf'
 import fastifyCsrf from '@fastify/csrf-protection'
+import * as moment from 'moment-timezone';
 
 async function bootstrap() {
   
@@ -37,6 +38,8 @@ async function bootstrap() {
   // app.use(csurf());
 
   // await app.register(fastifyCsrf);
+  
+  moment.tz.setDefault('America/Lima')
 
   //Puerto del servidor
   await app.listen(process.env.PORT_SERVER);

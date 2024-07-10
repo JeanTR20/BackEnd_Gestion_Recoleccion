@@ -39,6 +39,8 @@
     "csurf": "^1.11.0",
     "dotenv": "^16.3.1",
     "firebase": "^10.8.1",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.45",
     "mysql2": "^3.6.3",
     "passport": "^0.7.0",
     "reflect-metadata": "^0.1.13",
