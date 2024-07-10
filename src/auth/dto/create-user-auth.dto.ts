@@ -8,7 +8,7 @@ export class CreateUserAuhtDto{
 
     @IsString({message: 'La variable nombre_usuario debe ser de tipo string'})
     @IsNotEmpty({message: 'La variable nombre_usuario no debe estar vacio'})
-    @Length(6, 15, {message: 'La variable nombre_usuario deber tene minimo 6 a 15 caracteres'})
+    @Length(3, 40, {message: 'La variable nombre_usuario deber tene minimo 3 a 40 caracteres'})
     nombre_usuario: string;
 
     @IsString({message: 'La variable telefono debe ser de tipo string'})
