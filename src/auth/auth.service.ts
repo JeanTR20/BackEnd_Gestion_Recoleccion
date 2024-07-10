@@ -37,7 +37,7 @@ export class AuthService {
       );
 
       if(!usuario){
-        throw new UnauthorizedException('No es valido el DNI o el nombre de usuario')
+        throw new UnauthorizedException('No es valido el DNI')
       }
 
       const passHash = usuario.usuario_contrasena;
