@@ -132,20 +132,16 @@ export class AuthService {
       const {dni, telefono, nombre_usuario} = createUserAuhtDto;
 
       const validarDniCorreoUsuario = await this.authRepository.query(
-        'SELECT usuario_carnet_identidad, usuario_telefono, usuario_nombre_usuario FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_nombre_usuario = ? OR usuario_telefono = ? ',
+        'SELECT usuario_carnet_identidad, usuario_telefono FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_telefono = ? ',
         [dni, nombre_usuario, telefono]
       )
       
-      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni && usuario.usuario_nombre_usuario === nombre_usuario && usuario.usuario_telefono === telefono)){
-        throw new BadRequestException('el dni, número celular y nombre de usuario ya existe')
+      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni && usuario.usuario_telefono === telefono)){
+        throw new BadRequestException('el dni y número celular ya existe')
       }
 
       if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni)){
         throw new BadRequestException('el dni ya existe')
-      }
-
-      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_nombre_usuario === nombre_usuario)){
-        throw new BadRequestException('el nombre de usuario ya existe')
       }
 
       if(validarDniCorreoUsuario.some(usuario => usuario.usuario_telefono === telefono )){
