@@ -1,39 +1,43 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Auth } from './entities/auth.entity';
-import { Repository } from 'typeorm';
+import { Code, Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { RecoverAuthDto } from './dto/recover-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
-import { emitWarning } from 'process';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as crypto from 'crypto';
-import { EnvioCorreoAuthDto } from './dto/envio-correo-auth.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { EnviarSmsAuthDto } from './dto/enviar-sms-auth.dto';
+import { ConfigService } from '@nestjs/config';
+import * as Twilio from 'twilio';
+import { VerificarCodigoAuthDto } from './dto/verificar-codigo-auth.dto';
 
 
 @Injectable()
 export class AuthService {  
   
+  private twilioClient;
+
   constructor(
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     @InjectRepository(Auth) 
     private readonly authRepository: Repository<Auth>,
-    private readonly mailerService: MailerService
-  ){}
+    private readonly mailerService: MailerService,
+  ){
+    this.twilioClient = Twilio(
+      this.configService.get('TWILIO_ACCOUNT_SID'),
+      this.configService.get('TWILIO_AUTH_TOKEN')
+    );
+  }
 
   async login({dni_usuario, contrasena}: LoginAuthDto){
     try {
 
       const [usuario] = await this.authRepository.query(
-        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_nombre_usuario = ?',
-        [dni_usuario, dni_usuario]
+        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_carnet_identidad = ?',
+        [dni_usuario]
       );
 
       if(!usuario){
@@ -131,20 +135,20 @@ export class AuthService {
 
       const {dni, telefono, nombre_usuario} = createUserAuhtDto;
 
-      const validarDniCorreoUsuario = await this.authRepository.query(
+      const validarDniUsuario = await this.authRepository.query(
         'SELECT usuario_carnet_identidad, usuario_telefono FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_telefono = ? ',
-        [dni, nombre_usuario, telefono]
+        [dni, telefono]
       )
       
-      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni && usuario.usuario_telefono === telefono)){
+      if(validarDniUsuario.some(usuario => usuario.usuario_carnet_identidad === dni && usuario.usuario_telefono === telefono)){
         throw new BadRequestException('el dni y número celular ya existe')
       }
 
-      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === dni)){
+      if(validarDniUsuario.some(usuario => usuario.usuario_carnet_identidad === dni)){
         throw new BadRequestException('el dni ya existe')
       }
 
-      if(validarDniCorreoUsuario.some(usuario => usuario.usuario_telefono === telefono )){
+      if(validarDniUsuario.some(usuario => usuario.usuario_telefono === telefono )){
         throw new BadRequestException('el número de celular ya existe')
       }
 
@@ -152,9 +156,9 @@ export class AuthService {
 
       await this.authRepository.query(
         'call sp_registrar_usuario_residente(?,?,?,?,@id_usuario)', [
-          createUserAuhtDto.dni,
-          createUserAuhtDto.nombre_usuario,
-          createUserAuhtDto.telefono,
+          dni,
+          nombre_usuario,
+          telefono,
           passHashed,
         ]
       );
@@ -170,36 +174,95 @@ export class AuthService {
     }
   }
 
-  async envioCorreoRecover(envioCorreoAuthDto: EnvioCorreoAuthDto){
+  // async envioCorreoRecover(envioCorreoAuthDto: EnvioCorreoAuthDto){
 
-    const {correo} = envioCorreoAuthDto
-    try {
-      const [user] = await this.authRepository.query(
-        'SELECT usuario_correo, usuario_id FROM tbl_usuario WHERE usuario_correo = ?',
-        [correo]
-      )
+  //   const {correo} = envioCorreoAuthDto
+  //   try {
+  //     const [user] = await this.authRepository.query(
+  //       'SELECT usuario_correo, usuario_id FROM tbl_usuario WHERE usuario_correo = ?',
+  //       [correo]
+  //     )
       
-      if(!user){
-        throw new Error('no existe el correo');
+  //     if(!user){
+  //       throw new Error('no existe el correo');
+  //     }
+
+  //     const resetToken = this.jwtService.sign({correo}, {expiresIn: '3h'});
+  //     const resetLink = `http://localhost:4200/usuario/restablecer-contrasena?token=${resetToken}`
+
+  //     const templatePath = path.join(__dirname, '..', '..', 'src', 'auth', 'correo', 'recoverCorreo.html');
+  //     let html = fs.readFileSync(templatePath, 'utf-8');
+  //     html = html.replace('{{resetLink}}', resetLink)
+
+  //     await this.mailerService.sendMail({
+  //       to: correo,
+  //       subject: 'Restablecer contraseña',
+  //       html: html,
+        
+  //     });
+  //     return { message : 'Se envió el mensaje de correo correctamente'}
+
+  //   } catch (error) {
+  //     throw new InternalServerErrorException('Error al enviar, ' + error.message)
+  //   }
+  // }
+
+  async enviarCodigoVerificacion(enviarSmsAuthDto: EnviarSmsAuthDto){
+    try {
+      const {telefono} = enviarSmsAuthDto;
+
+      const [existenumero] = await this.authRepository.query(
+        'SELECT usuario_id ,usuario_telefono FROM tbl_usuario WHERE usuario_telefono = ?',
+        [telefono]
+      )
+
+      if(!existenumero){
+        throw new BadRequestException('El número de celular no esta registrado')
       }
 
-      const resetToken = this.jwtService.sign({correo}, {expiresIn: '3h'});
-      const resetLink = `http://localhost:4200/usuario/restablecer-contrasena?token=${resetToken}`
+      const now = new Date();
+      const expiracion = new Date(now.getTime() + 2 * 60000)
+      const codigoVerficacion = Math.floor(100000 + Math.random() * 900000).toString();
 
-      const templatePath = path.join(__dirname, '..', '..', 'src', 'auth', 'correo', 'recoverCorreo.html');
-      let html = fs.readFileSync(templatePath, 'utf-8');
-      html = html.replace('{{resetLink}}', resetLink)
-
-      await this.mailerService.sendMail({
-        to: correo,
-        subject: 'Restablecer contraseña',
-        html: html,
-        
+      await this.authRepository.query(
+        'call sp_registrar_codigo_verificacion(?,?,?)',
+        [telefono, codigoVerficacion, expiracion]
+      )
+      
+      const mensaje = await this.twilioClient.messages.create({
+        body: `Tu código de verificación para EcoRecoge es: ${codigoVerficacion}`,
+        to: '+51'+ telefono,
+        from: this.configService.get('TWILIO_PHONE_NUMBER')
       });
-      return { message : 'Se envió el mensaje de correo correctamente'}
+      // console.log(mensaje.sid)
+      return {message: 'Código de verificación enviado'}
+    } catch (error) {
+      // console.log('Error al enviar SMS:', error);
+      throw new BadRequestException('Error al enviar el código de verificación. ' + error.message)
+    }
+  }
+
+  async verificarCodigo(verificarCodigoAuthDto: VerificarCodigoAuthDto){
+    try {
+      const {telefono, codigo_verificacion} = verificarCodigoAuthDto;
+
+      console.log(telefono, codigo_verificacion)
+
+      const [result] = await this.authRepository.query(
+        'SELECT usuario_verificacion_codigo, usuario_expiracion_codigo FROM tbl_usuario WHERE usuario_telefono = ? AND usuario_verificacion_codigo = ?',
+        [telefono, codigo_verificacion]
+      )
+      
+      console.log(result.usuario_expiracion_codigo)
+
+      if(result && new Date(result.usuario_expiracion_codigo)> new Date()){
+        return {message: 'Código verificado correctamente'}
+      }else{
+        throw new BadRequestException('Código incorrecto')
+      }
 
     } catch (error) {
-      throw new InternalServerErrorException('Error al enviar, ' + error.message)
+      throw new BadRequestException('Error en la verificación del código, ' + error.message)
     }
   }
 
@@ -217,19 +280,46 @@ export class AuthService {
     }
   }
 
+  // async recoverPassword(recoverAuthDto: RecoverAuthDto){
+  //   try {
+
+  //     const {token, nuevo_password} = recoverAuthDto;
+
+  //     const decoded = this.jwtService.verify(token);
+  //     const correo = decoded.correo;
+      
+  //     const nuevo_passHashed = await bcryptjs.hash(nuevo_password, 10);
+
+  //     await this.authRepository.query(
+  //       'UPDATE tbl_usuario SET usuario_contrasena = ? WHERE usuario_correo = ?', 
+  //       [nuevo_passHashed, correo]
+  //     );
+   
+  //     return {message: 'Nueva contraseña actualizada correctanente'}
+  //   } catch (error) {
+  //     throw new UnauthorizedException('Token invalido o expirado')
+  //   }
+  // }
+
   async recoverPassword(recoverAuthDto: RecoverAuthDto){
     try {
 
-      const {token, nuevo_password} = recoverAuthDto;
+      const {telefono, nuevo_password} = recoverAuthDto;
 
-      const decoded = this.jwtService.verify(token);
-      const correo = decoded.correo;
+      const user = await this.authRepository.query(
+        'SELECT usuario_id FROM tbl_usuario WHERE usuario_telefono = ?',
+        [telefono]
+      )
       
+      if(!user){
+        throw new BadRequestException('El usuario no esta registrado')
+      }
+
       const nuevo_passHashed = await bcryptjs.hash(nuevo_password, 10);
 
       await this.authRepository.query(
-        'UPDATE tbl_usuario SET usuario_contrasena = ? WHERE usuario_correo = ?', 
-        [nuevo_passHashed, correo]
+        'UPDATE tbl_usuario SET usuario_contrasena = ? WHERE usuario_telefono = ?', 
+        [nuevo_passHashed, telefono]
       );
    
       return {message: 'Nueva contraseña actualizada correctanente'}

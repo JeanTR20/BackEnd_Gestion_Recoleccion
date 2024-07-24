@@ -1,17 +1,13 @@
-import { Controller, Get, Post, Body, Request,Patch, Param, Delete, Query, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request, Param, UseGuards} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
 import { RecoverAuthDto } from './dto/recover-auth.dto';
-import { isString } from 'class-validator';
-import { EnvioCorreoAuthDto } from './dto/envio-correo-auth.dto';
 import { AuthGuard } from './guard/auth.guard';
-import { Roles } from './decorators/roles.decorator';
-import { RolesGuard } from './guard/roles.guard';
-import { request } from 'http';
+import { EnviarSmsAuthDto } from './dto/enviar-sms-auth.dto';
+import { VerificarCodigoAuthDto } from './dto/verificar-codigo-auth.dto';
+import { RateLimit } from 'nestjs-rate-limiter';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -85,22 +81,57 @@ export class AuthController {
   }
 
 
-  @Post('enviar-correo')
+  // @Post('enviar-correo')
+  // @ApiHeader({
+  //   name: 'api-key',
+  //   description: 'Contra de API',
+  // })
+  // @ApiOperation({
+  //  summary: 'Envio de correo de restablecimiento de contrasena',
+  //   description:
+  //     'Esta API permite recuperar la contrasena del usuario, mediante los parametros:{"correo": "string"}, SP: sp_recuperar_contrasena(?)',
+  // })
+  // enviocorreorecover(
+  //   @Body() envioCorreoAuthDto: EnvioCorreoAuthDto
+  // ){
+  //   return this.authService.envioCorreoRecover(envioCorreoAuthDto)
+  // }
+  
+  @Post('enviar-sms')
+  
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
   })
   @ApiOperation({
-   summary: 'Envio de correo de restablecimiento de contrasena',
+   summary: 'Envio un SMS de restablecimiento de contraseña',
     description:
-      'Esta API permite recuperar la contrasena del usuario, mediante los parametros:{"correo": "string"}, SP: sp_recuperar_contrasena(?)',
+      'Esta API permite recuperar la contraseña del usuario, mediante los parametros:{"telefono": "string"}, SP: call sp_registrar_codigo_verificacion()',
   })
-  enviocorreorecover(
-    @Body() envioCorreoAuthDto: EnvioCorreoAuthDto
+  enviarsmsrecover(
+    @Body() enviarSmsAuthDto: EnviarSmsAuthDto
   ){
-    return this.authService.envioCorreoRecover(envioCorreoAuthDto)
+    return this.authService.enviarCodigoVerificacion(enviarSmsAuthDto)
   }
 
+  @Post('verificar-codigo')
+  @RateLimit({points: 10, duration: 300})
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+   summary: 'Verificar código enviado por SMS de restablecimiento de contraseña',
+    description:
+      'Esta API permite verificar el código, mediante los parametros:{"telefono": "string", "codigo: "string"}',
+  })
+  verficarcodigo(
+    @Body() verificarCodigoAuthDto: VerificarCodigoAuthDto
+  ){
+    return this.authService.verificarCodigo(verificarCodigoAuthDto)
+  }
+
+  
   @Post('actualizar-password')
   @ApiHeader({
     name: 'api-key',
