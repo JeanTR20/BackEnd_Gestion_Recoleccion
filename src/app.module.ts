@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Options } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // import { AppController } from './app.controller';
@@ -71,6 +71,7 @@ import { AdminResidenteModule } from './admin_residente/admin_residente.module';
     AdminResidenteModule
     //poner todos los modulos del la carpeta creada
   ],
+  exports: [],
   controllers: [],
   providers: [EventsGateway],
 })
