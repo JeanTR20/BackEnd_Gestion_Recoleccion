@@ -98,7 +98,7 @@ export class AuthController {
   // }
   
   @Post('enviar-sms')
-  
+  @RateLimit({points: 3, duration: 600, errorMessage: 'Has superado el número máximo de intentos. Por favor, intente nuevamente mas tarde.'})
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
