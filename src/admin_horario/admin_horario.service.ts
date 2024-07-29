@@ -127,24 +127,4 @@ export class AdminHorarioService {
       throw new BadRequestException('Error, '+ error.message)
     }
   }
-
-  // create(createAdminHorarioDto: CreateAdminHorarioDto) {
-  //   return 'This action adds a new adminHorario';
-  // }
-
-  // findAll() {
-  //   return `This action returns all adminHorario`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} adminHorario`;
-  // }
-
-  // update(id: number, updateAdminHorarioDto: UpdateAdminHorarioDto) {
-  //   return `This action updates a #${id} adminHorario`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} adminHorario`;
-  // }
 }
