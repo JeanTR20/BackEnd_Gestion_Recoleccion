@@ -3,9 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/usuario.entity';
 import { Repository } from 'typeorm';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtService } from '@nestjs/jwt';
 import { CreateUsuarioPersonal } from './dto/create-usuario-personal.dto';
-import { dir } from 'console';
 import * as bcryptjs from 'bcryptjs';
 import { UpdateUsuarioPersonalDto } from './dto/update-usuario-personal.dto';
 
@@ -20,7 +18,6 @@ export class UsuarioService {
     private readonly usuarioRespository: Repository<Usuario>
     ){
   }
-
 
   async crearUsuarioPersonal(createUsuarioPersonal: CreateUsuarioPersonal){
     try {
@@ -110,18 +107,6 @@ export class UsuarioService {
         [carnet_identidad, correo]
       );
 
-      // if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad && usuario.usuario_correo === correo )){
-      //   throw new BadRequestException('El carnet de identidad y el correo ya existe')
-      // }
-
-      // if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad )){
-      //   throw new BadRequestException('El carnet de identidad ya existe')
-      // }
-
-      // if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
-      //   throw new BadRequestException('El correo ya existe')
-      // }
-
       await this.usuarioRespository.query(
         'call sp_admin_actualizar_personal(?,?,?,?,?,?,?,?,?,?,?,?)',
         [ 
@@ -170,42 +155,4 @@ export class UsuarioService {
       throw new BadRequestException('Error, '+ error.message)
     }
   }
-
-
-  // async recuperarContrasena(token: string){
-  //   try {
-  //     const decoded = await this.jwtService.verifyAsync(token);
-  //     const usuario_id = decoded.id_usuario
-  //     console.log(decoded)t6  mn hytna2e  rctn 
-  //     const [recuperarcontrasena] = await this.authRepository.query(
-  //       'call sp_recuperar_contrasenjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjja(?)', [usuario_id]
-  //     );
-
-  //     const passHashed = await bcryptjs.hash( recuperarcontrasena.nueva_contrasena, 10);
-   
-  //     return recuperarcontrasena;
-  //   } catch (error) {
-  //     throw new Error('Erro al recuperar contrasena')
-  //   }
-  // }
-  
-  // create(createUsuarioDto: CreateUsuarioDto) {
-  //   return 'This action adds a new usuario';
-  // }
-
-  // findAll() {
-  //   return `This action returns all usuario`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} usuario`;
-  // }
-
-  // update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-  //   return `This action updates a #${id} usuario`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} usuario`;
-  // }
 }

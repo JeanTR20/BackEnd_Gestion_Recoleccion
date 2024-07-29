@@ -1,13 +1,9 @@
 import { BadRequestException, Body, Injectable } from '@nestjs/common';
-import { CreateNotificacionDto } from './dto/create-notificacion.dto';
-import { UpdateNotificacionDto } from './dto/update-notificacion.dto';
 import * as webPush from 'web-push';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notificacion } from './entities/notificacion.entity';
-import { title } from 'process';
 import { AuthService } from 'src/auth/auth.service';
-import { DataNotificacionDto } from './dto/data-notificacion.dto';
 import { CronJob } from 'cron';
 
 @Injectable()
@@ -55,7 +51,7 @@ export class NotificacionService {
     
     const [hour, minute] = programar[0].programar_hora.split(':').map(num => parseInt(num, 10));
     const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar[0].programar_dia)}`;
-    console.log(`Scheduling job with crontime: ${crontime}`);
+    // console.log(`Scheduling job with crontime: ${crontime}`);
 
     const job = new CronJob(crontime, async () =>{
 
@@ -77,7 +73,7 @@ export class NotificacionService {
         const response = await webPush.sendNotification(suscripcion, pushNotificacion)
         console.log('Notification sent:', response);
       } catch (error) {
-        console.error('Error sending push notification', error);
+        // console.error('Error sending push notification', error);
         throw new BadRequestException('Error al enviar la notificacion', error.message)
       }
     }, null, true, 'America/Lima');
@@ -127,9 +123,9 @@ export class NotificacionService {
     if(job) {
       job.stop();
       this.cronJobMap.delete(id_usuario);
-      console.log(`notificacion para el id_usuario ${id_usuario} ha sido cancelado`);
+      // console.log(`notificacion para el id_usuario ${id_usuario} ha sido cancelado`);
     }else{
-      console.log(`no se encontro Cronjob para el usuario ${id_usuario}`)
+      // console.log(`no se encontro Cronjob para el usuario ${id_usuario}`)
     }
   } 
 }

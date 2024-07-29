@@ -1,10 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Headers, Request, UseGuards, BadRequestException } from '@nestjs/common';
 import { NotificacionService } from './notificacion.service';
-import { CreateNotificacionDto } from './dto/create-notificacion.dto';
-import { UpdateNotificacionDto } from './dto/update-notificacion.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { DataNotificacionDto } from './dto/data-notificacion.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
 
 @ApiTags('Notificacion')
 @Controller('notificacion')
@@ -30,7 +26,6 @@ export class NotificacionController {
     const {ruta, dia, hora, suscripcion} = body
     return this.notificacionService.programarNotificacion(token, suscripcion, ruta, dia, hora);
   } 
-
 
   @Post('cancelar-notificacion/:id_usuario')
   @ApiHeader({
@@ -60,28 +55,4 @@ export class NotificacionController {
     return this.notificacionService.obtenerDatoNotificacion(token)
   }
 
-  // @Post()
-  // create(@Body() createNotificacionDto: CreateNotificacionDto) {
-  //   return this.notificacionService.create(createNotificacionDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.notificacionService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.notificacionService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateNotificacionDto: UpdateNotificacionDto) {
-  //   return this.notificacionService.update(+id, updateNotificacionDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.notificacionService.remove(+id);
-  // }
 }

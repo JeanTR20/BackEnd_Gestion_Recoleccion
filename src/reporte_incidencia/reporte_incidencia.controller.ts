@@ -3,7 +3,6 @@ import { ReporteIncidenciaService } from './reporte_incidencia.service';
 import { CreateReporteIncidenciaDto } from './dto/create-reporte_incidencia.dto';
 import { UpdateReporteIncidenciaDto } from './dto/update-reporte_incidencia.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { query } from 'express';
 import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
 
 @ApiTags('Reporte-incidencia')
@@ -62,28 +61,4 @@ export class ReporteIncidenciaController {
     return this.reporteIncidenciaService.actualizarEstado(id_incidencia, updateReporteIncidenciaDto)
   }
 
-  // @Post()
-  // create(@Body() createReporteIncidenciaDto: CreateReporteIncidenciaDto) {
-  //   return this.reporteIncidenciaService.create(createReporteIncidenciaDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.reporteIncidenciaService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.reporteIncidenciaService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateReporteIncidenciaDto: UpdateReporteIncidenciaDto) {
-  //   return this.reporteIncidenciaService.update(+id, updateReporteIncidenciaDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.reporteIncidenciaService.remove(+id);
-  // }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Auth } from './entities/auth.entity';
 import { Code, Repository } from 'typeorm';
@@ -280,27 +280,6 @@ export class AuthService {
     }
   }
 
-  // async recoverPassword(recoverAuthDto: RecoverAuthDto){
-  //   try {
-
-  //     const {token, nuevo_password} = recoverAuthDto;
-
-  //     const decoded = this.jwtService.verify(token);
-  //     const correo = decoded.correo;
-      
-  //     const nuevo_passHashed = await bcryptjs.hash(nuevo_password, 10);
-
-  //     await this.authRepository.query(
-  //       'UPDATE tbl_usuario SET usuario_contrasena = ? WHERE usuario_correo = ?', 
-  //       [nuevo_passHashed, correo]
-  //     );
-   
-  //     return {message: 'Nueva contraseña actualizada correctanente'}
-  //   } catch (error) {
-  //     throw new UnauthorizedException('Token invalido o expirado')
-  //   }
-  // }
-
   async recoverPassword(recoverAuthDto: RecoverAuthDto){
     try {
 
@@ -359,6 +338,5 @@ export class AuthService {
   // remove(id: number) {
   //   return `This action removes a #${id} auth`;
   // }
-
   
 }

@@ -16,8 +16,6 @@ export class AuthController {
 
 
   @Post('login')
-  // @UseGuards()
-  // @Roles(['Administrador', 'Recolector', 'Residente'])
   @ApiBearerAuth('acces-token')
   @ApiHeader({
     name: 'api-key',
@@ -80,23 +78,6 @@ export class AuthController {
     return this.authService.validadarTokenCorreo(token)
   }
 
-
-  // @Post('enviar-correo')
-  // @ApiHeader({
-  //   name: 'api-key',
-  //   description: 'Contra de API',
-  // })
-  // @ApiOperation({
-  //  summary: 'Envio de correo de restablecimiento de contrasena',
-  //   description:
-  //     'Esta API permite recuperar la contrasena del usuario, mediante los parametros:{"correo": "string"}, SP: sp_recuperar_contrasena(?)',
-  // })
-  // enviocorreorecover(
-  //   @Body() envioCorreoAuthDto: EnvioCorreoAuthDto
-  // ){
-  //   return this.authService.envioCorreoRecover(envioCorreoAuthDto)
-  // }
-  
   @Post('enviar-sms')
   @RateLimit({points: 3, duration: 600, errorMessage: 'Demasiados intentos. Por favor, intente nuevamente mas tarde.'})
   @ApiHeader({
@@ -146,42 +127,6 @@ export class AuthController {
     return this.authService.recoverPassword(recoverAuthDto)
   }
 
-  // @Get('validar-token')
-  // @ApiHeader({
-  //   name: 'api-key',
-  //   description: 'Contra de API',
-  // })
-  
-  // @ApiOperation({
-  //   summary: 'Validar token 2',
-  //   description:
-  //     'Esta API obtiene los datos del usuario, mediante los parametros:{"token": "string"}, SP: call sp_validar_login(?)',
-  // })
-  // validarToken(@Request() req: Request) {
-  //   const user = req['user']
-  //   return this.authService.obtenerDatos(user)
-  // }
-
-  // @Post()
-  // @ApiHeader({
-  //   name: 'api-key',
-  //   description: 'Contra de API',
-  // })
-  // @ApiOperation({
-  //   summary: 'Recuperar contrasena',
-  //   description:
-  //     'Esta API permite recuperar la contrasena del usuario, mediante los parametros:{"id_usuario": "string"}, SP: sp_recuperar_contrasena(?)',
-  // })
-  // recuperarcontrasena(
-  //   @Body() recoverAuthDto: RecoverAuthDto
-  // ){
-  //   return this.authService.recuperarContrasena(recoverAuthDto.token)
-  // }
-  // @Post()
-  // create(@Body() createAuthDto: CreateAuthDto) {
-  //   return this.authService.create(createAuthDto);
-  // }
-
   @Get()
   @UseGuards(AuthGuard)
   findAll( @Request() req: Request) {
@@ -189,7 +134,7 @@ export class AuthController {
     return this.authService.findAll;
   }
 
-  // @Get('pruba/:id')
+  // @Get('prueba/:id')
   // findOne(@Param('id') id: string) {
   //   return this.authService.findOne(+id);
   // }

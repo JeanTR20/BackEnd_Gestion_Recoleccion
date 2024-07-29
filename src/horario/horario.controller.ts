@@ -1,7 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { HorarioService } from './horario.service';
-import { CreateHorarioDto } from './dto/create-horario.dto';
-import { UpdateHorarioDto } from './dto/update-horario.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DataListarHorarioDto } from './dto/data-listar-horario.dto';
 import { DataAnadirRutaDto } from './dto/data-anadir_ruta.dto';
@@ -27,7 +25,6 @@ export class HorarioController {
     return this.horarioService.listarHorario(dataListarHorarioDto)
   }
 
-  
   @Post('anadir-ruta')
   @ApiHeader({
     name: 'api-key',
@@ -72,28 +69,4 @@ export class HorarioController {
     return this.horarioService.eliminarRuta(id_ruta)
   }
 
-  // @Post()
-  // create(@Body() createHorarioDto: CreateHorarioDto) {
-  //   return this.horarioService.create(createHorarioDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.horarioService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.horarioService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateHorarioDto: UpdateHorarioDto) {
-  //   return this.horarioService.update(+id, updateHorarioDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.horarioService.remove(+id);
-  // }
 }
