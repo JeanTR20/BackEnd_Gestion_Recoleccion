@@ -328,11 +328,6 @@ export class AuthService {
     }
   }
   
- 
-  // create(createAuthDto: CreateAuthDto) {
-  //   return 'This action adds a new auth';
-  // }
-
   async obtenerDatosById(id_usuario: string){
 
     const [datos] = await this.authRepository.query(

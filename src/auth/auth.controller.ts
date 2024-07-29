@@ -98,7 +98,7 @@ export class AuthController {
   // }
   
   @Post('enviar-sms')
-  @RateLimit({points: 3, duration: 600, errorMessage: 'Has superado el número máximo de intentos. Por favor, intente nuevamente mas tarde.'})
+  @RateLimit({points: 3, duration: 600, errorMessage: 'Demasiados intentos. Por favor, intente nuevamente mas tarde.'})
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
@@ -115,7 +115,7 @@ export class AuthController {
   }
 
   @Post('verificar-codigo')
-  @RateLimit({points: 10, duration: 300})
+  @RateLimit({points: 5, duration: 300, errorMessage: 'Demasiados intentos. Por favor, intente nuevamente mas tarde.'})
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
@@ -189,7 +189,7 @@ export class AuthController {
     return this.authService.findAll;
   }
 
-  // @Get(':id')
+  // @Get('pruba/:id')
   // findOne(@Param('id') id: string) {
   //   return this.authService.findOne(+id);
   // }

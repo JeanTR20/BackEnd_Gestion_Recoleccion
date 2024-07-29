@@ -16,6 +16,8 @@ import { NotificacionModule } from './notificacion/notificacion.module';
 import { EventsGateway } from './events/events.gateway';
 import { EventsModule } from './events/events.module';
 import { AdminResidenteModule } from './admin_residente/admin_residente.module';
+import { RateLimiterGuard, RateLimiterModule } from 'nestjs-rate-limiter';
+import { APP_GUARD } from '@nestjs/core';
 
 
 @Module({
@@ -56,6 +58,9 @@ import { AdminResidenteModule } from './admin_residente/admin_residente.module';
         from: '"Muncipalidad Distrital de Huancán" <jeantorresricse@gmail.com>',
       },
     }),
+
+    RateLimiterModule,
+    
     HorarioModule,
     
     AuthModule,
@@ -73,6 +78,9 @@ import { AdminResidenteModule } from './admin_residente/admin_residente.module';
   ],
   exports: [],
   controllers: [],
-  providers: [EventsGateway],
+  providers: [EventsGateway, {
+    provide: APP_GUARD,
+    useClass: RateLimiterGuard
+  }],
 })
 export class AppModule {}
