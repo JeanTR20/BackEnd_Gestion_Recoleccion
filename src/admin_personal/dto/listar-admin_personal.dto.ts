@@ -1,6 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsBoolean, IsBooleanString, IsIn, IsNumber, IsNumberString, IsOptional, IsString, MaxLength, Min, MinLength } from "class-validator";
+import { IsIn, IsNumber, IsNumberString, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class ListarAdminPersonal{
 

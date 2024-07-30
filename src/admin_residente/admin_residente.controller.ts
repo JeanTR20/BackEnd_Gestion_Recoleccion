@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Query, Post, Body } from '@nestjs/common';
 import { AdminResidenteService } from './admin_residente.service';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListarAdminResidenteDto } from './dto/listar-admin-residente.dto';
+import { UpdateAdminResidenteDto } from './dto/update-admin_residente.dto';
 
 @ApiTags('Admin-residente')
 @Controller('admin-residente')
@@ -21,6 +22,22 @@ export class AdminResidenteController {
     @Query() listarAdminResidenteDto: ListarAdminResidenteDto
   ){
     return this.adminResidenteService.listarResidente(listarAdminResidenteDto)
+  }
+
+  @Post('actualizar/:id_usuario')
+  @ApiHeader({
+    name: 'Api-Key',
+    description: 'Contra de API'
+  })
+  @ApiOperation({
+    summary: 'Actualizar residente - admin',
+    description: 'Esta Api permite actualizar los residentes, mediante el Query:{"id_usuario":"number", "telefono":"string", "carnet_identidad":"string","nombre_usuario":"string"}, SP: sp_admin_actualizar_residente(?,?,?,?) '
+  })
+  editarresidente(
+    @Param('id_usuario') id_usuario: number,
+    @Body() updateAdminResidenteDto: UpdateAdminResidenteDto,
+  ){
+    return this.adminResidenteService.editarResidente(id_usuario, updateAdminResidenteDto)
   }
 
   @Delete('eliminar-residente/:id_usuario')
