@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete, Query, Post, Body } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Query, Body, Patch } from '@nestjs/common';
 import { AdminResidenteService } from './admin_residente.service';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListarAdminResidenteDto } from './dto/listar-admin-residente.dto';
@@ -24,7 +24,7 @@ export class AdminResidenteController {
     return this.adminResidenteService.listarResidente(listarAdminResidenteDto)
   }
 
-  @Post('actualizar/:id_usuario')
+  @Patch('actualizar/:id_usuario')
   @ApiHeader({
     name: 'Api-Key',
     description: 'Contra de API'
