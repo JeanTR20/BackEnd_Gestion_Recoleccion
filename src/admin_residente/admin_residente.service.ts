@@ -44,7 +44,7 @@ export class AdminResidenteService {
       const {carnet_identidad, nombre_usuario, telefono, } = updateAdminResidenteDto
       await this.adminResidenteRepository.query(
         'call sp_admin_actualizar_residente(?,?,?,?)',
-        [id_usuario, carnet_identidad, nombre_usuario, telefono]
+        [id_usuario, telefono, carnet_identidad, nombre_usuario ]
       );
       return {message: 'Se actualizo exitosamente el usuario residente'}
     } catch (error) {
