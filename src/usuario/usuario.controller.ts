@@ -42,7 +42,7 @@ export class UsuarioController {
     return this.usuarioService.actualizarPersonal(id_usuario, updateUsuarioPersonalDto)
   }
 
-  @Patch('dar-baja-usuario/:id_usuario')
+  @Patch('dar-baja-cuenta/:id_usuario')
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
@@ -50,7 +50,7 @@ export class UsuarioController {
   @ApiOperation({
     summary: 'Dar de baja a usuario',
     description:
-      'Esta API permite dar de baja a usuario personal(recolector) mediante el parametro:{"id_usuario":"number"}. SP: sp_admin_dar_baja_usuario_personal()',
+      'Esta API permite dar de baja a usuario personal(recolector) mediante el parametro:{"id_usuario":"number"}. SP: sp_admin_dar_baja_cuenta()',
   })
   darbajausuario(
     @Param('id_usuario') id_usuario: number 

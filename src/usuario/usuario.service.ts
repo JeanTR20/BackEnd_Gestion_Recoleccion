@@ -135,7 +135,7 @@ export class UsuarioService {
   async darBajaUsuario(id_usuario: number){
     try {
       await this.usuarioRespository.query(
-        'call sp_admin_dar_baja_usuario_personal(?)',
+        'call sp_admin_dar_baja_cuenta(?)',
         [id_usuario]
       );
       return {message: 'Se dio de baja al usuario exitosamente'}
