@@ -36,12 +36,12 @@ export class AuthService {
     try {
 
       const [usuario] = await this.authRepository.query(
-        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_carnet_identidad = ?',
+        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_carnet_identidad = ? AND usuario_estado = 1',
         [dni_usuario]
       );
 
       if(!usuario){
-        throw new UnauthorizedException('No es valido el DNI')
+        throw new UnauthorizedException('No es valido el DNI o no está registrado')
       }
 
       const passHash = usuario.usuario_contrasena;
