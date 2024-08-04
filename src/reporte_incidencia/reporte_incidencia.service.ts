@@ -93,14 +93,16 @@ export class ReporteIncidenciaService {
 
   async listarMiReporte(listarMiReporteDto: ListarMiReporteDto){
     try {
-      const {id_usuario, id_rol, estado} = listarMiReporteDto;
+      const {token_usuario, estado} = listarMiReporteDto;
+
+      const id_usuario = await this.authService.obtenerTokenUsuario(token_usuario)
 
       const [reporte] = await this.reporteIncidenciaRepository.query(
-        'call sp_listar_mi_reporte_incidencia(?,?,?)', 
-        [id_usuario, id_rol, estado]
+        'call sp_listar_mi_reporte_incidencia(?,?)', 
+        [id_usuario, estado]
       );
       return reporte;
-      
+
     } catch (error) {
       throw new BadRequestException('Error al listar mi reporte, ' + error.message)
     }
