@@ -7,6 +7,9 @@ import fastifyCsrf from '@fastify/csrf-protection'
 import * as moment from 'moment-timezone';
 
 async function bootstrap() {
+
+  // Configuración de la zona horaria por defecto para moment
+  moment.tz.setDefault('America/Lima');
   
   const app = await NestFactory.create(AppModule);
 
@@ -39,8 +42,6 @@ async function bootstrap() {
 
   // await app.register(fastifyCsrf);
   
-  moment.tz.setDefault('America/Lima')
-
   //Puerto del servidor
   await app.listen(process.env.PORT_SERVER);
 }

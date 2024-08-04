@@ -4,6 +4,8 @@ import { CreateReporteIncidenciaDto } from './dto/create-reporte_incidencia.dto'
 import { UpdateReporteIncidenciaDto } from './dto/update-reporte_incidencia.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
+import { ListAdminHorarioDto } from 'src/admin_horario/dto/list-admin-horario.dto';
+import { ListarMiReporteDto } from './dto/listar-mi-reporte.dto';
 
 @ApiTags('Reporte-incidencia')
 @Controller('reporte-incidencia')
@@ -61,4 +63,20 @@ export class ReporteIncidenciaController {
     return this.reporteIncidenciaService.actualizarEstado(id_incidencia, updateReporteIncidenciaDto)
   }
 
+  @Get('listar-mi-reporte')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  
+  @ApiOperation({
+    summary: 'Listar mi reporte',
+    description:
+      'Esta API permite listar mi reporte de incidencia de residuos solidos, mediante los parametros:{"id_usuario": "number", "id_rol":"string", "estado": "string"}, SP: call sp_admin_listar_reporte_incidencia(?,?,?,?)',
+  })
+  listarmireporte(
+    @Query() listarMiReporteDto: ListarMiReporteDto
+  ){
+    return this.reporteIncidenciaService.listarMiReporte(listarMiReporteDto)
+  }
 }

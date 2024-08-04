@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
 import { EventsGateway } from 'src/events/events.gateway';
+import { ListarMiReporteDto } from './dto/listar-mi-reporte.dto';
 
 @Injectable()
 export class ReporteIncidenciaService {
@@ -87,6 +88,21 @@ export class ReporteIncidenciaService {
       }
     } catch (error) {
       throw new BadRequestException('Error, ' + error.message)
+    }
+  }
+
+  async listarMiReporte(listarMiReporteDto: ListarMiReporteDto){
+    try {
+      const {id_usuario, id_rol, estado} = listarMiReporteDto;
+
+      const [reporte] = await this.reporteIncidenciaRepository.query(
+        'call sp_listar_mi_reporte_incidencia(?,?,?)', 
+        [id_usuario, id_rol, estado]
+      );
+      return reporte;
+      
+    } catch (error) {
+      throw new BadRequestException('Error al listar mi reporte, ' + error.message)
     }
   }
 
