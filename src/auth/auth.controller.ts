@@ -79,7 +79,12 @@ export class AuthController {
   }
 
   @Post('enviar-sms')
-  @RateLimit({points: 3, duration: 600, errorMessage: 'Demasiados intentos. Por favor, intente nuevamente mas tarde.'})
+  @RateLimit({
+    keyPrefix: 'enviar-sms',
+    points: 3, 
+    duration: 600, 
+    errorMessage: 'Demasiados intentos. Por favor, intente nuevamente mas tarde.'
+  })
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
@@ -96,7 +101,12 @@ export class AuthController {
   }
 
   @Post('verificar-codigo')
-  @RateLimit({points: 5, duration: 300, errorMessage: 'Demasiados intentos. Por favor, intente nuevamente mas tarde.'})
+  @RateLimit({
+    keyPrefix: 'verificar-codigo',
+    points: 5, 
+    duration: 300, 
+    errorMessage: 'Demasiados intentos. Por favor, intente nuevamente mas tarde.'
+  })
   @ApiHeader({
     name: 'api-key',
     description: 'Contra de API',
