@@ -52,12 +52,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit('userConnectionStatus', { userId: payload.userId, isConnected });
   }
 
-  public notificacionDetectarModificacionHorario(detectadoCambioHorario: any): void{
-    this.server.emit('cambioHorarioDetectado', detectadoCambioHorario, (resp) => {
-      console.log(`Confirmación recibida de ${resp.clientId}`);
-    });
+  // public notificacionDetectarModificacionHorario(detectadoCambioHorario: any): void{
+  //   this.server.emit('cambioHorarioDetectado', detectadoCambioHorario, (resp) => {
+  //     console.log(`Confirmación recibida de ${resp.clientId}`);
+  //   });
     
-  }
+  // }
 
   public notificacionDetectarEstadoCulminadoReporte(detectadoEstadoReporte: any, userId):void{
     this.emitEventToUser('detectadoEstadoCulminadoReporte', detectadoEstadoReporte, userId);
