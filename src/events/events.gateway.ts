@@ -1,7 +1,20 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({cors:true})
+@WebSocketGateway({
+  // wssEngine: ['ws', 'wss'],
+  // transports: ['websocket'],
+  cors: {
+    origin: '*'
+  },
+  path: '/socket.io'
+  // allowEI03: true,
+  // cors: {
+  //   origin: ['https://ecohuancan.com', 'http://127.0.0.1:4200'],
+  //   methods: ["GET", "POST"]
+  // }
+  // cors: true
+})
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server:Server;
 

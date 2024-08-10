@@ -34,11 +34,10 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-  app.enableCors({
-    // allowedHeaders: 'Content-Type, Authorization'
-    // allowedHeaders: ['Authorization', 'Content-Type']
-  });
-  // app.use(csurf());
+
+  app.enableCors();
+  
+  // app.use();
 
   // await app.register(fastifyCsrf);
   
