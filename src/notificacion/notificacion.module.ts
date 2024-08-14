@@ -9,5 +9,6 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [TypeOrmModule.forFeature([Notificacion]), AuthModule],
   controllers: [NotificacionController],
   providers: [NotificacionService],
+  exports: [NotificacionService]
 })
 export class NotificacionModule {}

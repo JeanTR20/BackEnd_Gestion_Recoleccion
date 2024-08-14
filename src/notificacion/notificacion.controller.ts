@@ -15,7 +15,7 @@ export class NotificacionController {
   })
   @ApiOperation({
     summary: 'Enviar notificación',
-    description: 'Esta API permite envia las notificaciones a los residentes que hayan iniciado sesión, mediante los Parametro: {"id_usuario": "number"}, SP:sp_obtener_suscripcion_notificacion(?)'
+    description: 'Esta API permite envia las notificaciones a los residentes que hayan iniciado sesión, mediante los Parametro: {"token": "number"}, SP:sp_obtener_programacion_notificacion(?)'
   })
   enviarnotificacion(
     @Headers('Authorization') headers: string, 
@@ -54,5 +54,21 @@ export class NotificacionController {
   obtenernotificacion(@Param('token') token: string){
     return this.notificacionService.obtenerDatoNotificacion(token)
   }
+
+  @Post('subscribe')
+  @ApiHeader({
+    name:'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'obtener suscribe',
+    description: 'Esta API recibe la suscripcion enviada desde el cliente para obtener la suscripcion de la aplicacion web'
+  })
+  addsuscribe(
+    @Body() subscription: any
+  ){
+    console.log(subscription)
+    return this.notificacionService.addSuscripcion(subscription);
+  } 
 
 }

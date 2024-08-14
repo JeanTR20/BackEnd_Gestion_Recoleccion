@@ -37,6 +37,7 @@
     "class-validator": "0.14.0",
     "cron": "^3.1.7",
     "csurf": "^1.11.0",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.3.1",
     "firebase": "^10.8.1",
     "moment": "^2.30.1",

@@ -32,11 +32,6 @@ export class AdminHorarioService {
         [dia, hora_inicio, recorrido, referencia_punto, ruta_id]
       );
 
-      this.eventsGateway.notificacionDetectarModificacionHorario({ 
-        action: 'create', 
-        schedule: createhorario, 
-        message:`Se ha creado un nuevo horario para la ruta N° ${ruta_id} del día ${dia}, con un recorrido ${recorrido} que hace el camión compactador de recojo de basura a las ${formatTime}.`
-      });
       return { message: 'se creo existosamente un nuevo horario'}
 
     } catch (error) {
@@ -76,11 +71,6 @@ export class AdminHorarioService {
   - Hora de inicio: ${formattedTime}
   - Recorrido: ${recorrido}`;
 
-      this.eventsGateway.notificacionDetectarModificacionHorario({ 
-        action: 'update', 
-        schedule: updatehorario, 
-        message: mensaje,
-      });
 
       return{ message: 'Se actualizó exitamente' }
      
@@ -101,11 +91,6 @@ export class AdminHorarioService {
         'call sp_admin_eliminar_horario(?)', [id_horario]
       );
 
-      this.eventsGateway.notificacionDetectarModificacionHorario({ 
-        action: 'delete', 
-        scheduleId: id_horario, 
-        message:`El horario de la ruta N° ${horario.ruta_id}, el dia ${horario.horariopunto_dia}, en la hora ${horario.horariopunto_hora_inicio} del recorrido ${horario.horariopunto_recorrido} ha sido eliminado.`
-      });
 
       return {
         message: 'Se elimino un registro de la tabla horario'

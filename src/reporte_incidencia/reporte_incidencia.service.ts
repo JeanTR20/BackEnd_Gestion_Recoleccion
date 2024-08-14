@@ -8,6 +8,9 @@ import { AuthService } from 'src/auth/auth.service';
 import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
 import { EventsGateway } from 'src/events/events.gateway';
 import { ListarMiReporteDto } from './dto/listar-mi-reporte.dto';
+import { NotificacionService } from 'src/notificacion/notificacion.service';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 @Injectable()
 export class ReporteIncidenciaService {
@@ -15,6 +18,7 @@ export class ReporteIncidenciaService {
   constructor(
     private readonly authService: AuthService,
     private readonly eventsGateway: EventsGateway,
+    private readonly notificacionService: NotificacionService,
     @InjectRepository(ReporteIncidencia) 
     private readonly reporteIncidenciaRepository: Repository<ReporteIncidencia>
     
@@ -30,13 +34,6 @@ export class ReporteIncidenciaService {
         'call sp_registrar_incidencia_reporte(?,?,?,?,?)', 
         [descripcion, direccion, referencia_calle, foto, id_usuario ]
       );
-
-      // this.eventsGateway.notificacionDetectarRegistroIncidencia({ 
-      //   action: 'create', 
-      //   schedule: registroIncidencia, 
-      //   message: 'Hay un nuevo registro de incidencia, por favor revisarlo.',
-      // });
-
       return {message: 'Se registro el reporte de incidencia de residuos solido exitosamente'}
     } catch (error) {
       throw new BadRequestException('Erro al registrar, ' + error.message)
@@ -67,22 +64,37 @@ export class ReporteIncidenciaService {
     try {
 
       const [id_usuario] = await this.reporteIncidenciaRepository.query(
-        'SELECT usuario_id FROM tbl_incidencia_reporte WHERE incidencia_id = ?',
+        'SELECT incidencia_fecha_reporte, usuario_id FROM tbl_incidencia_reporte WHERE incidencia_id = ?',
         [id_incidencia]
       )
+
+      const idusuario = id_usuario.usuario_id;
+      const fecha_reporte = new Date(id_usuario.incidencia_fecha_reporte);
+      const fecha_formateada = format(fecha_reporte, 'PPPP \'a las\' p a', { locale: es });
 
       const actualizarEstado = await this.reporteIncidenciaRepository.query(
         'call sp_admin_actualizar_estado_incidencia(?,?)', [id_incidencia, estado]
       );
 
-      this.eventsGateway.notificacionDetectarEstadoCulminadoReporte({ 
-        action: 'update', 
-        schedule: actualizarEstado, 
-        message: 'Tu reporte de incidencia ha sido culminado',
-        userId: id_usuario.usuario_id,
-        estado: estado
-      }, id_usuario.usuario_id);
-
+      if(estado === '1'){
+        const subscriptions = await this.notificacionService.getSubscriptionByUserId(idusuario);
+        if(subscriptions.length > 0 && subscriptions){
+          await this.notificacionService.enviarNotificacionEstadoReporteCulminado(subscriptions, {
+            notification: {
+              title: 'Reporte de residuos solidos culminado',
+              body: `Tu reporte de incidencia de residuos sólidos realizado en la fecha de ${fecha_formateada} ha sido atendido.`,
+              vibrate: [100, 50, 100],
+              icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
+              badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
+              actions: [{
+                action: '',
+                title: 'Cerrar'
+              }]
+            }
+          })
+        }
+      }
+      
       return {
         message: 'Se actualizo la estado de la incidencia exitosamente'
       }

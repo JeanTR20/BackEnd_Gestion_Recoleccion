@@ -5,25 +5,32 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Notificacion } from './entities/notificacion.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { CronJob } from 'cron';
+import { Twilio } from 'twilio';
 
 @Injectable()
 export class NotificacionService {
 
   private cronJobMap = new Map<number, CronJob>();
 
+  // private client: Twilio
+
   constructor(
 
     private readonly authService: AuthService,
     @InjectRepository(Notificacion)
     private readonly notificacionRepository: Repository<Notificacion>,
-
   ){
 
     webPush.setVapidDetails(
-      'mailto:jeantorresricse@gmail.com', // Un email de contacto para tu servidor
+      'mailto:support@ecohuancan.com', // Un email de contacto para tu servidor
       process.env.VAPID_PUBLIC_KEY,
       process.env.VAPID_PRIVATE_KEY,
     );
+
+    // this.client = new Twilio(
+    //   process.env.TWILIO_ACCOUNT_SID,
+    //   process.env.TWILIO_AUTH_TOKEN,
+    // )
   }
 
   async programarNotificacion(token: string, suscripcion: any, ruta: string, dia:string, hora: string){
@@ -127,5 +134,68 @@ export class NotificacionService {
     }else{
       // console.log(`no se encontro Cronjob para el usuario ${id_usuario}`)
     }
-  } 
+  }
+
+  async addSuscripcion(subscripcion: any){
+    try {
+      // this.subscriptions.push(subscripcion);
+      const {id_usuario, subscripcion: {endpoint, keys:{p256dh, auth }}} = subscripcion
+      await this.notificacionRepository.query(
+        'call sp_agregar_suscripcion(?,?,?,?)',
+        [endpoint, p256dh, auth, id_usuario]
+      )
+      console.log('subscripcion agregada')
+    } catch (error) {
+      throw new BadRequestException('Error al obtener dato de suscripcion, ', error.message)
+    }
+  }
+
+  async getSubscriptionByUserId(userId: number) {
+    // const subscription = await this.subscriptions.find(sub => sub.id_usuario === userId);
+    const subscriptions = await this.notificacionRepository.query(
+      'SELECT suscripcion_endpoint, suscripcion_p256dh, suscripcion_auth FROM tbl_suscripcion WHERE usuario_id = ?',
+      [userId]
+    )
+
+    if(!subscriptions.length){
+      console.log("No se encontró ninguna suscripción para el ID de usuario:", userId);
+      return []
+    }
+
+    return subscriptions.map(subscription => ({
+      endpoint: subscription.suscripcion_endpoint,
+      expirationTime: null,
+      keys: {
+        p256dh: subscription.suscripcion_p256dh,
+        auth: subscription.suscripcion_auth
+      }
+    }))
+  }
+
+  async enviarNotificacionEstadoReporteCulminado(subscriptions: any[], payload: any){
+    for (const subscription of subscriptions){
+      try {
+        const response = await webPush.sendNotification(subscription, JSON.stringify(payload));
+        console.log('Notification sent:', response);
+      } catch (error) {
+        // throw new BadRequestException('Error al enviar la notificacion', error.message)
+        if(error.statusCode === 410){
+          await this.deleteSuscripcion(subscription.endpoint)
+        }
+      }
+    }
+    
+  }
+
+  async deleteSuscripcion(endpoint: string){
+    try {
+      await this.notificacionRepository.query(
+        'DELETE FROM tbl_suscripcion WHERE suscripcion_endpoint = ?',
+        [endpoint]
+      )
+    } catch (error) {
+      throw new Error('Erro no se puede eliminar la suscripcion invalida');
+    }
+  }
+
 }
