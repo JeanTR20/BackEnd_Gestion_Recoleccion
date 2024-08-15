@@ -81,7 +81,7 @@ export class ReporteIncidenciaService {
         if(subscriptions.length > 0 && subscriptions){
           await this.notificacionService.enviarNotificacionEstadoReporteCulminado(subscriptions, {
             notification: {
-              title: 'Reporte de residuos solidos culminado',
+              title: 'Reporte de residuos solidos atendido',
               body: `Tu reporte de incidencia de residuos sólidos realizado en la fecha de ${fecha_formateada} ha sido atendido.`,
               vibrate: [100, 50, 100],
               icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',

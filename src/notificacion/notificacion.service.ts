@@ -151,25 +151,28 @@ export class NotificacionService {
   }
 
   async getSubscriptionByUserId(userId: number) {
-    // const subscription = await this.subscriptions.find(sub => sub.id_usuario === userId);
-    const subscriptions = await this.notificacionRepository.query(
-      'SELECT suscripcion_endpoint, suscripcion_p256dh, suscripcion_auth FROM tbl_suscripcion WHERE usuario_id = ?',
-      [userId]
-    )
-
-    if(!subscriptions.length){
-      console.log("No se encontró ninguna suscripción para el ID de usuario:", userId);
-      return []
-    }
-
-    return subscriptions.map(subscription => ({
-      endpoint: subscription.suscripcion_endpoint,
-      expirationTime: null,
-      keys: {
-        p256dh: subscription.suscripcion_p256dh,
-        auth: subscription.suscripcion_auth
+    try {
+      const subscriptions = await this.notificacionRepository.query(
+        'SELECT suscripcion_endpoint, suscripcion_p256dh, suscripcion_auth FROM tbl_suscripcion WHERE usuario_id = ?',
+        [userId]
+      )
+  
+      if(!subscriptions.length){
+        console.log("No se encontró ninguna suscripción para el ID de usuario:", userId);
+        return []
       }
-    }))
+  
+      return subscriptions.map(subscription => ({
+        endpoint: subscription.suscripcion_endpoint,
+        expirationTime: null,
+        keys: {
+          p256dh: subscription.suscripcion_p256dh,
+          auth: subscription.suscripcion_auth
+        }
+      }));
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
+    }
   }
 
   async enviarNotificacionEstadoReporteCulminado(subscriptions: any[], payload: any){
@@ -194,7 +197,46 @@ export class NotificacionService {
         [endpoint]
       )
     } catch (error) {
-      throw new Error('Erro no se puede eliminar la suscripcion invalida');
+      throw new Error('Error no se puede eliminar la suscripcion invalida');
+    }
+  }
+
+
+  async getAllSuscripciones(){
+    try {
+      const suscripciones = await this.notificacionRepository.query(
+        'SELECT suscripcion_endpoint, suscripcion_p256dh, suscripcion_auth FROM tbl_suscripcion'
+      );
+
+      if(!suscripciones.length){
+        console.log("No se encontró ninguna suscripción");
+        return []
+      }
+
+      return suscripciones.map(suscripcion => ({
+        endpoint: suscripcion.suscripcion_endpoint,
+        expirationTime: null,
+        keys: {
+          p256dh: suscripcion.suscripcion_p256dh,
+          auth: suscripcion.suscripcion_auth
+        }
+      }));
+
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
+    }
+  }
+
+  async enviarNotificacionActualizacionHorario(subscriptions: any[], payload: any){
+    for(const subscription of subscriptions){
+      try {
+        const response = await webPush.sendNotification(subscription, JSON.stringify(payload));
+        console.log('Notificación enviada: ', response)
+      } catch (error) {
+        if(error.statusCode === 410){
+          await this.deleteSuscripcion(subscription.endpoint)
+        }
+      }
     }
   }
 

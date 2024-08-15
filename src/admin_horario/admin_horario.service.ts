@@ -6,12 +6,14 @@ import { AdminHorario } from './entities/admin_horario.entity';
 import { Repository } from 'typeorm';
 import { ListAdminHorarioDto } from './dto/list-admin-horario.dto';
 import { EventsGateway } from 'src/events/events.gateway';
+import { NotificacionService } from 'src/notificacion/notificacion.service';
 
 @Injectable()
 export class AdminHorarioService {
 
   constructor(
     private readonly eventsGateway: EventsGateway,
+    private readonly notificacionService: NotificacionService,
     @InjectRepository(AdminHorario) 
     private readonly adminHorarioRepository: Repository<AdminHorario>
     
@@ -48,8 +50,6 @@ export class AdminHorarioService {
         [id_horario]
       );
 
-      console.log(horarioActual)
-
       if(!horarioActual){
         throw new NotFoundException(`El horario con ID ${id_horario} no existe.`)
       }
@@ -65,12 +65,23 @@ export class AdminHorarioService {
         [id_horario, dia, hora_inicio, recorrido, referencia_punto, ruta_id]
       );
 
-      let mensaje = `Detalle del cambio de horario:
-  - Ruta: ${ruta_id}
-  - Dia: ${dia}
-  - Hora de inicio: ${formattedTime}
-  - Recorrido: ${recorrido}`;
+      const suscripciones = await this.notificacionService.getAllSuscripciones();
 
+      if(suscripciones.length > 0 && suscripciones){
+        await this.notificacionService.enviarNotificacionActualizacionHorario( suscripciones, {
+          notification: {
+            title: 'Actualización de horario de residuos solidos',
+            body: `El horario de la ruta: ${horarioActual.ruta_id} del dia ${horarioActual.horariopunto_dia} fue actualizado. Horario actualizado a: RUTA: ${ruta_id}, DIA: ${dia}, HORA DE INICIO: ${formattedTime} y RECORRIDO: ${recorrido}.`,
+            vibrate: [100, 50, 100],
+            icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
+            badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
+            actions: [{
+              action: '',
+              title: 'Cerrar'
+            }]
+          }
+        })
+      }
 
       return{ message: 'Se actualizó exitamente' }
      
