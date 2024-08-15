@@ -150,15 +150,16 @@ export class NotificacionService {
     }
   }
 
+  //esta funcion obtiene la suscripciones del residentes y recolectores por id
   async getSubscriptionByUserId(userId: number) {
     try {
       const subscriptions = await this.notificacionRepository.query(
-        'SELECT suscripcion_endpoint, suscripcion_p256dh, suscripcion_auth FROM tbl_suscripcion WHERE usuario_id = ?',
+        'call sp_obtener_suscripcion_by_id_residente_recolector(?)',
         [userId]
       )
   
       if(!subscriptions.length){
-        console.log("No se encontró ninguna suscripción para el ID de usuario:", userId);
+        console.log("No se encontró ninguna suscripción para el ID de usuario residente o recolector:", userId);
         return []
       }
   
