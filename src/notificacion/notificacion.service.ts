@@ -176,21 +176,6 @@ export class NotificacionService {
     }
   }
 
-  async enviarNotificacionEstadoReporteCulminado(subscriptions: any[], payload: any){
-    for (const subscription of subscriptions){
-      try {
-        const response = await webPush.sendNotification(subscription, JSON.stringify(payload));
-        console.log('Notification sent:', response);
-      } catch (error) {
-        // throw new BadRequestException('Error al enviar la notificacion', error.message)
-        if(error.statusCode === 410){
-          await this.deleteSuscripcion(subscription.endpoint)
-        }
-      }
-    }
-    
-  }
-
   async deleteSuscripcion(endpoint: string){
     try {
       await this.notificacionRepository.query(
@@ -238,6 +223,32 @@ export class NotificacionService {
           await this.deleteSuscripcion(subscription.endpoint)
         }
       }
+    }
+  }
+
+  //esta funcion obtiene todas la suscripciones de los usuarios administradores
+  async getAllSuscripcionesAdmin(){
+    try {
+      const suscripciones = await this.notificacionRepository.query(
+        'call sp_obtener_suscripcion_administrador()',
+      );
+
+      if(!suscripciones.length){
+        console.log("No se encontró ninguna suscripción del usuario residente o recolector");
+        return [];
+      }
+
+      return suscripciones.map(suscripcion => ({
+        endpoint: suscripcion.suscripcion_endpoint,
+        expirationTime: null,
+        keys: {
+          p256dh: suscripcion.suscripcion_p256dh,
+          auth: suscripcion.suscripcion_auth
+        }
+      }));
+      
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
     }
   }
 

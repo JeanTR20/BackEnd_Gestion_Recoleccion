@@ -79,7 +79,7 @@ export class ReporteIncidenciaService {
       if(estado === '1'){
         const subscriptions = await this.notificacionService.getSubscriptionByUserId(idusuario);
         if(subscriptions.length > 0 && subscriptions){
-          await this.notificacionService.enviarNotificacionEstadoReporteCulminado(subscriptions, {
+          await this.notificacionService.enviarNotificacionToSuscripciones(subscriptions, {
             notification: {
               title: 'Reporte de residuos solidos atendido',
               body: `Tu reporte de incidencia de residuos sólidos realizado en la fecha de ${fecha_formateada} ha sido atendido.`,
