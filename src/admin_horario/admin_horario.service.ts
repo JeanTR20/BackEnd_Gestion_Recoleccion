@@ -34,7 +34,7 @@ export class AdminHorarioService {
         [dia, hora_inicio, recorrido, referencia_punto, ruta_id]
       );
 
-      const suscripciones = await this.notificacionService.getAllSuscripciones();
+      const suscripciones = await this.notificacionService.getAllSuscripcionesResidenteRecolector();
 
       if(suscripciones.length > 0 && suscripciones){
         await this.notificacionService.enviarNotificacionToSuscripciones( suscripciones, {
@@ -83,7 +83,7 @@ export class AdminHorarioService {
         [id_horario, dia, hora_inicio, recorrido, referencia_punto, ruta_id]
       );
 
-      const suscripciones = await this.notificacionService.getAllSuscripciones();
+      const suscripciones = await this.notificacionService.getAllSuscripcionesResidenteRecolector();
 
       if(suscripciones.length > 0 && suscripciones){
         await this.notificacionService.enviarNotificacionToSuscripciones( suscripciones, {
@@ -125,7 +125,7 @@ export class AdminHorarioService {
         'call sp_admin_eliminar_horario(?)', [id_horario]
       );
 
-      const suscripciones = await this.notificacionService.getAllSuscripciones();
+      const suscripciones = await this.notificacionService.getAllSuscripcionesResidenteRecolector();
 
       if(suscripciones.length > 0 && suscripciones){
         await this.notificacionService.enviarNotificacionToSuscripciones( suscripciones, {

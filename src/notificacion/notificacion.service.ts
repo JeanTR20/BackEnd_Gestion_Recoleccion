@@ -202,15 +202,15 @@ export class NotificacionService {
     }
   }
 
-
-  async getAllSuscripciones(){
+  //esta funcion obtiene todas la suscripciones del residentes y recolectores
+  async getAllSuscripcionesResidenteRecolector(){
     try {
       const suscripciones = await this.notificacionRepository.query(
-        'SELECT suscripcion_endpoint, suscripcion_p256dh, suscripcion_auth FROM tbl_suscripcion'
+        'call sp_obtener_suscripcion_residente_recolector()'
       );
 
       if(!suscripciones.length){
-        console.log("No se encontró ninguna suscripción");
+        console.log("No se encontró ninguna suscripción del usuario residente o recolector");
         return []
       }
 
