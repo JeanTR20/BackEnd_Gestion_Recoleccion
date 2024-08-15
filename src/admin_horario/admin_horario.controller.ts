@@ -35,7 +35,7 @@ export class AdminHorarioController {
   @ApiOperation({
     summary: 'Actualizar horario',
     description:
-      'Esta API permite actualizar un nuevo horario de recoleccion de basura, mediante los parametros:{"id_horario": "string", dia":"string", "hora_inicio":"date", "recorrido":"string", "referencia_punto":"string" , "ruta_id":"string"}. SP: sp_admin_actualizar_horario()',
+      'Esta API permite actualizar un nuevo horario de recoleccion de basura, mediante los parametros:{"id_horario": "number", dia":"string", "hora_inicio":"date", "recorrido":"string", "referencia_punto":"string" , "ruta_id":"string"}. SP: sp_admin_actualizar_horario()',
   })
   actualizarHorario(
     @Param('id_horario') id_horario: number,
@@ -45,6 +45,15 @@ export class AdminHorarioController {
   }
 
   @Delete('eliminar-horario/:id_horario')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Eliminar horario',
+    description:
+      'Esta API permite eliminar un horario de la lista de horarios, mediante los parametros:{"id_horario": "number"}. SP: sp_admin_eliminar_horario()',
+  })
   deletehorario(@Param('id_horario') id_horario: number){
     return this.adminHorarioService.deleteHorario(id_horario);
   }

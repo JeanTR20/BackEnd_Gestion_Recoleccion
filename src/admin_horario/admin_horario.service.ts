@@ -116,10 +116,32 @@ export class AdminHorarioService {
         [id_horario]
       );
 
+      console.log(horario.horariopunto_hora_inicio)
+
+      const formattedTime = horario.horariopunto_hora_inicio.slice(0, 5);
+      console.log(formattedTime)
+
       await this.adminHorarioRepository.query(
         'call sp_admin_eliminar_horario(?)', [id_horario]
       );
 
+      const suscripciones = await this.notificacionService.getAllSuscripciones();
+
+      if(suscripciones.length > 0 && suscripciones){
+        await this.notificacionService.enviarNotificacionToSuscripciones( suscripciones, {
+          notification: {
+            title: 'Eliminación de un horario de residuos solidos',
+            body: `El horario de la ruta ${horario.ruta_id} del dia ${horario.horariopunto_dia}, con la hora de las ${formattedTime} y recorrido por ${horario.horariopunto_recorrido} fue eliminado.`,
+            vibrate: [100, 50, 100],
+            icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
+            badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
+            actions: [{
+              action: '',
+              title: 'Cerrar'
+            }]
+          }
+        })
+      }
 
       return {
         message: 'Se elimino un registro de la tabla horario'
