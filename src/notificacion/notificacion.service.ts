@@ -227,7 +227,7 @@ export class NotificacionService {
     }
   }
 
-  async enviarNotificacionActualizacionHorario(subscriptions: any[], payload: any){
+  async enviarNotificacionToSuscripciones(subscriptions: any[], payload: any){
     for(const subscription of subscriptions){
       try {
         const response = await webPush.sendNotification(subscription, JSON.stringify(payload));
