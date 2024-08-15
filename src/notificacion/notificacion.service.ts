@@ -233,8 +233,6 @@ export class NotificacionService {
         'call sp_obtener_suscripcion_administrador()',
       );
 
-      console.log(suscripciones)
-
       if(!suscripciones.length){
         console.log("No se encontró ninguna suscripción del usuario residente o recolector");
         return [];

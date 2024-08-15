@@ -42,8 +42,6 @@ export class ReporteIncidenciaService {
 
       const suscripciones = await this.notificacionService.getAllSuscripcionesAdmin();
 
-      console.log(suscripciones)
-
       if(suscripciones.length > 0 && suscripciones){
         await this.notificacionService.enviarNotificacionToSuscripciones(suscripciones, {
           notification: {
