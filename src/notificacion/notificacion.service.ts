@@ -153,7 +153,7 @@ export class NotificacionService {
   //esta funcion obtiene la suscripciones del residentes y recolectores por id
   async getSubscriptionByUserId(userId: number) {
     try {
-      const subscriptions = await this.notificacionRepository.query(
+      const [subscriptions] = await this.notificacionRepository.query(
         'call sp_obtener_suscripcion_by_id_residente_recolector(?)',
         [userId]
       )
@@ -190,7 +190,7 @@ export class NotificacionService {
   //esta funcion obtiene todas la suscripciones del residentes y recolectores
   async getAllSuscripcionesResidenteRecolector(){
     try {
-      const suscripciones = await this.notificacionRepository.query(
+      const [suscripciones] = await this.notificacionRepository.query(
         'call sp_obtener_suscripcion_residente_recolector()'
       );
 
@@ -229,9 +229,11 @@ export class NotificacionService {
   //esta funcion obtiene todas la suscripciones de los usuarios administradores
   async getAllSuscripcionesAdmin(){
     try {
-      const suscripciones = await this.notificacionRepository.query(
+      const [suscripciones] = await this.notificacionRepository.query(
         'call sp_obtener_suscripcion_administrador()',
       );
+
+      console.log(suscripciones)
 
       if(!suscripciones.length){
         console.log("No se encontró ninguna suscripción del usuario residente o recolector");
