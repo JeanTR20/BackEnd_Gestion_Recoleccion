@@ -18,6 +18,7 @@ import { EventsModule } from './events/events.module';
 import { AdminResidenteModule } from './admin_residente/admin_residente.module';
 import { RateLimiterGuard, RateLimiterModule } from 'nestjs-rate-limiter';
 import { APP_GUARD } from '@nestjs/core';
+import { AdminNotificacionModule } from './admin_notificacion/admin_notificacion.module';
 
 
 @Module({
@@ -73,7 +74,8 @@ import { APP_GUARD } from '@nestjs/core';
     AdminPersonalModule,
     NotificacionModule,
     EventsModule,
-    AdminResidenteModule
+    AdminResidenteModule,
+    AdminNotificacionModule
     //poner todos los modulos del la carpeta creada
   ],
   exports: [],
