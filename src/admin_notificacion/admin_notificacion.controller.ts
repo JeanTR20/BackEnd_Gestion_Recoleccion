@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body} from '@nestjs/common';
 import { AdminNotificacionService } from './admin_notificacion.service';
-import { CreateAdminNotificacionDto } from './dto/create-admin_notificacion.dto';
-import { UpdateAdminNotificacionDto } from './dto/update-admin_notificacion.dto';
+import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { NotificacionPersonalizadaDto } from './dto/notificacion-personalizadas.dto';
 
+@ApiTags('Admin-Notificacion')
 @Controller('admin-notificacion')
 export class AdminNotificacionController {
   constructor(private readonly adminNotificacionService: AdminNotificacionService) {}
 
-  @Post()
-  create(@Body() createAdminNotificacionDto: CreateAdminNotificacionDto) {
-    return this.adminNotificacionService.create(createAdminNotificacionDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.adminNotificacionService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminNotificacionService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminNotificacionDto: UpdateAdminNotificacionDto) {
-    return this.adminNotificacionService.update(+id, updateAdminNotificacionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminNotificacionService.remove(+id);
-  }
+  @Post('enviar-notificacion-personalizada')
+  @ApiHeader({
+    name:'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'enviar notificacion personalizada',
+    description: 'Esta API permite enviar la notificacion personalizada a todos los usuarios residente y recolectores, lo cual es generado por el administrador'
+  })
+  enviarnotificacionpersonalizada(
+    @Body() notificacionPersonalizadaDto: NotificacionPersonalizadaDto,
+  ){
+    return this.adminNotificacionService.enviarNotificacionPersonalizada(notificacionPersonalizadaDto);
+  } 
 }

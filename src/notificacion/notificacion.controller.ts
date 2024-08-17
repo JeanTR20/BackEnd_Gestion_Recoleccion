@@ -67,7 +67,6 @@ export class NotificacionController {
   addsuscribe(
     @Body() subscription: any
   ){
-    console.log(subscription)
     return this.notificacionService.addSuscripcion(subscription);
   } 
 
