@@ -16,7 +16,7 @@ export class AdminNotificacionService {
     private readonly adminnotificacionRepository: Repository<AdminNotificacion>,
   ){}
 
-  async enviarNotificacionPersonalizada({descripcion}: NotificacionPersonalizadaDto){
+  async enviarNotificacionPersonalizada({titulo, descripcion}: NotificacionPersonalizadaDto){
     try {
 
       if(!descripcion || descripcion.length < 10){
@@ -28,7 +28,7 @@ export class AdminNotificacionService {
       if(suscripciones.length > 0 && suscripciones){
         await this.notificacionService.enviarNotificacionToSuscripciones(suscripciones, {
           notification: {
-            title: 'Aviso Importante',
+            title: `${titulo}`,
             body: `${descripcion}`,
             vibrate: [100, 50, 100],
             icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
