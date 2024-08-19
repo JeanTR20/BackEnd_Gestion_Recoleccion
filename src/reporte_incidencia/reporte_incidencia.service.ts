@@ -98,12 +98,12 @@ export class ReporteIncidenciaService {
         'call sp_admin_actualizar_estado_incidencia(?,?)', [id_incidencia, estado]
       );
 
-      if(estado === '1'){
+      if( estado === '1'){ 
         const subscriptions = await this.notificacionService.getSubscriptionByUserId(idusuario);
         if(subscriptions.length > 0 && subscriptions){
           await this.notificacionService.enviarNotificacionToSuscripciones(subscriptions, {
             notification: {
-              title: 'Reporte de residuos solidos atendido',
+              title: 'Reporte de incidencia de residuos solidos atendido',
               body: `Tu reporte de incidencia de residuos sólidos realizado en la fecha de ${fecha_formateada} ha sido atendido.`,
               vibrate: [100, 50, 100],
               icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
