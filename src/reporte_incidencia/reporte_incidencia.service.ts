@@ -6,7 +6,6 @@ import { ReporteIncidencia } from './entities/reporte_incidencia.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
-import { EventsGateway } from 'src/events/events.gateway';
 import { ListarMiReporteDto } from './dto/listar-mi-reporte.dto';
 import { NotificacionService } from 'src/notificacion/notificacion.service';
 import { format } from 'date-fns';
@@ -17,7 +16,6 @@ export class ReporteIncidenciaService {
 
   constructor(
     private readonly authService: AuthService,
-    private readonly eventsGateway: EventsGateway,
     private readonly notificacionService: NotificacionService,
     @InjectRepository(ReporteIncidencia) 
     private readonly reporteIncidenciaRepository: Repository<ReporteIncidencia>

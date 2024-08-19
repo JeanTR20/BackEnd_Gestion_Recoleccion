@@ -5,14 +5,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AdminHorario } from './entities/admin_horario.entity';
 import { Repository } from 'typeorm';
 import { ListAdminHorarioDto } from './dto/list-admin-horario.dto';
-import { EventsGateway } from 'src/events/events.gateway';
 import { NotificacionService } from 'src/notificacion/notificacion.service';
 
 @Injectable()
 export class AdminHorarioService {
 
   constructor(
-    private readonly eventsGateway: EventsGateway,
     private readonly notificacionService: NotificacionService,
     @InjectRepository(AdminHorario) 
     private readonly adminHorarioRepository: Repository<AdminHorario>

@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as csurf from 'csurf'
-import fastifyCsrf from '@fastify/csrf-protection'
 import * as moment from 'moment-timezone';
 
 async function bootstrap() {

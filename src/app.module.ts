@@ -13,8 +13,6 @@ import { PassportModule } from '@nestjs/passport';
 import { AdminHorarioModule } from './admin_horario/admin_horario.module';
 import { AdminPersonalModule } from './admin_personal/admin_personal.module';
 import { NotificacionModule } from './notificacion/notificacion.module';
-import { EventsGateway } from './events/events.gateway';
-import { EventsModule } from './events/events.module';
 import { AdminResidenteModule } from './admin_residente/admin_residente.module';
 import { RateLimiterGuard, RateLimiterModule } from 'nestjs-rate-limiter';
 import { APP_GUARD } from '@nestjs/core';
@@ -73,14 +71,13 @@ import { AdminNotificacionModule } from './admin_notificacion/admin_notificacion
     AdminHorarioModule,
     AdminPersonalModule,
     NotificacionModule,
-    EventsModule,
     AdminResidenteModule,
     AdminNotificacionModule
     //poner todos los modulos del la carpeta creada
   ],
   exports: [],
   controllers: [],
-  providers: [EventsGateway, {
+  providers: [{
     provide: APP_GUARD,
     useClass: RateLimiterGuard
   }],
