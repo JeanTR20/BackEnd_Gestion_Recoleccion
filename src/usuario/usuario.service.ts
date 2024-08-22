@@ -6,6 +6,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { CreateUsuarioPersonal } from './dto/create-usuario-personal.dto';
 import * as bcryptjs from 'bcryptjs';
 import { UpdateUsuarioPersonalDto } from './dto/update-usuario-personal.dto';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import { CreateUsuarioAdministradorDto } from './dto/create-usuario-administrador.dto';
 
 @ApiTags('Usuario')
 @Injectable()
@@ -17,6 +19,74 @@ export class UsuarioService {
     @InjectRepository(Usuario) 
     private readonly usuarioRespository: Repository<Usuario>
     ){
+  }
+
+  async crearUsuarioAdministrador(crearUsuarioAdministradorDto: CreateUsuarioAdministradorDto){
+    try {
+      const {
+        id_usuario,
+        nombre_completo, 
+        apellido_paterno, 
+        apellido_materno, 
+        fecha_nacimiento, 
+        direccion, 
+        telefono, 
+        tipo_carnet, 
+        carnet_identidad,
+        genero,
+        imagen,
+        correo, 
+        nombre_usuario, 
+        contrasena
+      } = crearUsuarioAdministradorDto
+
+      const validarCorreoUsuario = await this.usuarioRespository.query(
+        'SELECT usuario_carnet_identidad, usuario_correo FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_correo = ?',
+        [carnet_identidad, correo]
+      )
+      
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad && usuario.usuario_correo === correo )){
+        throw new BadRequestException('El carnet de identidad y el correo ya existe')
+      }
+
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_carnet_identidad === carnet_identidad )){
+        throw new BadRequestException('El carnet de identidad ya existe')
+      }
+
+      if(validarCorreoUsuario.some(usuario => usuario.usuario_correo === correo )){
+        throw new BadRequestException('El correo ya existe')
+      }
+
+
+      const contrasenaHashed = await bcryptjs.hash(contrasena, 10)
+  
+      await this.usuarioRespository.query(
+        'call sp_admin_crear_usuario_administrador(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [
+          id_usuario,
+          nombre_completo,
+          apellido_paterno, 
+          apellido_materno, 
+          fecha_nacimiento, 
+          direccion, 
+          telefono, 
+          tipo_carnet, 
+          carnet_identidad, 
+          genero,
+          imagen,
+          correo,
+          nombre_usuario,
+          contrasenaHashed
+        ]
+      );
+  
+      return {
+        message: 'se registro exitosamente el usuario del administrador'
+      }
+    } catch (error) {
+      throw new BadRequestException('Error al registrar, ' + error.message)
+    }
+
   }
 
   async crearUsuarioPersonal(createUsuarioPersonal: CreateUsuarioPersonal){

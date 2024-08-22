@@ -3,11 +3,28 @@ import { UsuarioService } from './usuario.service';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUsuarioPersonal } from './dto/create-usuario-personal.dto';
 import { UpdateUsuarioPersonalDto } from './dto/update-usuario-personal.dto';
+import { CreateUsuarioAdministradorDto } from './dto/create-usuario-administrador.dto';
 
 @ApiTags('Usuario')
 @Controller('usuario')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
+
+  @Post('crear-administrador')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Crear usuario administrador',
+    description:
+      'Esta API permite crear un usuario administrador mediante los parametros:{"id_usuario": "number", "nombre_completo":"string", "apellido_paterno":"string", "apellido_paterno":"string", "apellido_materno":"string","fecha_nacimiento":"string", "direccion":"string", "telefono":"string", "tipo_carnet":"string","carnet_identidad":"string" ,"genero":"string", "imagen":"string", "correo":"string", "nombre_usuario":"string", "contrasena":"string"}. SP: sp_admin_crear_usuario_personal()',
+  })
+  crearadministrador(
+    @Body() crearUsuarioAdministradorDto: CreateUsuarioAdministradorDto
+  ){
+    return this.usuarioService.crearUsuarioAdministrador(crearUsuarioAdministradorDto)
+  }
 
   @Post('crear-personal')
   @ApiHeader({
