@@ -79,4 +79,21 @@ export class ReporteIncidenciaController {
   ){
     return this.reporteIncidenciaService.listarMiReporte(listarMiReporteDto)
   }
+
+  @Delete('eliminar-reporte/:id_reporte')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  
+  @ApiOperation({
+    summary: 'eliminar un reporte',
+    description:
+      'Esta API permite eliminar un reporte de incidencia de residuos solidos, mediante los parametros:{"id_usuario": "number"}, SP: call sp_admin_listar_reporte_incidencia(?,?,?,?)',
+  })
+  elimniarreporte(
+    @Param('id_reporte') id_reporte: number
+  ){
+    return this.reporteIncidenciaService.eliminarReporteIncidencia(id_reporte)
+  }
 }

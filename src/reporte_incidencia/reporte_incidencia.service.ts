@@ -62,6 +62,21 @@ export class ReporteIncidenciaService {
     }
   }
   
+  async eliminarReporteIncidencia(id_reporte: number){
+    try {
+      await this.reporteIncidenciaRepository.query(
+        'call sp_admin_eliminar_reporte_incidencia(?)', [id_reporte]
+      )
+
+      return {
+        message: 'Se elimino el reporte de incidencia exitosamente'
+      }
+
+    } catch (error) {
+      throw new BadRequestException('Error al eliminar', error.message)
+    }
+  }
+
   // api para administrador
 
   async listarIncidencia(listarIncidenciaDto: ListarIncidenciaDto){
