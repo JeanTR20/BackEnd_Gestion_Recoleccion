@@ -23,8 +23,8 @@ export class NotificacionController {
   ){
 
     const token = headers.split(' ')[1];
-    const {ruta, dia, hora, suscripcion} = body
-    return this.notificacionService.programarNotificacion(token, suscripcion, ruta, dia, hora);
+    const {dia, hora, suscripcion} = body
+    return this.notificacionService.programarNotificacion(token, suscripcion, dia, hora);
   } 
 
   @Post('cancelar-notificacion/:id_usuario')
