@@ -1,4 +1,5 @@
-import { IsNumberString, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { Type } from "class-transformer";
+import { IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, MaxLength, Min, MinLength } from "class-validator";
 
 export class ListarAdminResidenteDto {
     
@@ -11,4 +12,16 @@ export class ListarAdminResidenteDto {
     @IsOptional()
     @IsString({message: 'La variable nombres_usuario deben ser de tipo string'})
     nombres_usuario?: string;
+    
+    @IsNumber({}, {message: 'La variable page debe ser de tipo numerico'})
+    @Type(()=> Number)
+    @IsNotEmpty({message: 'La variable page no debe estar vacio'})
+    @Min(1, {message: 'La variable page no debe ser menor a 1'})
+    page: number;
+    
+    @IsNumber({}, {message: 'La variable sizePage debe ser de tipo numerico'})
+    @Type(()=> Number)
+    @IsNotEmpty({message: 'La variable sizePage no debe estar vacio'})
+    @Min(1, {message: 'La variable sizePage no debe ser menor a 1'})
+    sizePage: number;
 }

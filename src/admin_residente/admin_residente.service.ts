@@ -15,13 +15,23 @@ export class AdminResidenteService {
 
   async listarResidente(listarAdminResidenteDto: ListarAdminResidenteDto){
     try {
-      const {numero_carnet, nombres_usuario} = listarAdminResidenteDto
+      const {numero_carnet, nombres_usuario, page, sizePage} = listarAdminResidenteDto;
+
+      const startIndex = (page - 1) * sizePage
 
       const [residente] = await this.adminResidenteRepository.query(
-        'call sp_admin_listar_residente(?,?)',
+        'call sp_admin_listar_residente(?,?,?,?)',
+        [numero_carnet, nombres_usuario, startIndex, sizePage]
+      );
+      
+      const [totalResult] = await this.adminResidenteRepository.query(
+        'call sp_admin_contar_residente(?,?)',
         [numero_carnet, nombres_usuario]
       )
-      return residente;
+
+      const totalResidente = totalResult[0].total;
+
+      return {totalResidente, residente}
     } catch (error) {
       throw new BadRequestException(error.message)
     }
