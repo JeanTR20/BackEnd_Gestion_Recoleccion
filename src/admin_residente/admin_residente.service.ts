@@ -4,6 +4,7 @@ import { AdminResidente } from './entities/admin_residente.entity';
 import { Repository } from 'typeorm';
 import { ListarAdminResidenteDto } from './dto/listar-admin-residente.dto';
 import { UpdateAdminResidenteDto } from './dto/update-admin_residente.dto';
+import { ListarAdminResidenteFiltradoDto } from './dto/listar-admin-residente-filtrado.dto';
 
 @Injectable()
 export class AdminResidenteService {
@@ -32,6 +33,21 @@ export class AdminResidenteService {
       const totalResidente = totalResult[0].total;
 
       return {totalResidente, residente}
+    } catch (error) {
+      throw new BadRequestException(error.message)
+    }
+  }
+
+  async listarResidenteFiltrado(ListarAdminResidenteFiltradoDto: ListarAdminResidenteFiltradoDto){
+    try {
+      const {numero_carnet, nombres_usuario} = ListarAdminResidenteFiltradoDto;
+
+      const [residente] = await this.adminResidenteRepository.query(
+        'call sp_admin_listar_residente_filtrado(?,?)',
+        [numero_carnet, nombres_usuario]
+      );
+
+      return residente;
     } catch (error) {
       throw new BadRequestException(error.message)
     }

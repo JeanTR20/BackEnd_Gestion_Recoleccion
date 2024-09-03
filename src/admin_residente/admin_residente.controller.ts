@@ -3,6 +3,7 @@ import { AdminResidenteService } from './admin_residente.service';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListarAdminResidenteDto } from './dto/listar-admin-residente.dto';
 import { UpdateAdminResidenteDto } from './dto/update-admin_residente.dto';
+import { ListarAdminResidenteFiltradoDto } from './dto/listar-admin-residente-filtrado.dto';
 
 @ApiTags('Admin-residente')
 @Controller('admin-residente')
@@ -22,6 +23,21 @@ export class AdminResidenteController {
     @Query() listarAdminResidenteDto: ListarAdminResidenteDto
   ){
     return this.adminResidenteService.listarResidente(listarAdminResidenteDto)
+  }
+
+  @Get('residente-filtrado')
+  @ApiHeader({
+    name: 'Api-Key',
+    description: 'Contra de API'
+  })
+  @ApiOperation({
+    summary: 'Listar residente filtrado - admin',
+    description: 'Esta Api permite listar y filtrar los residentes, mediante el Query:{"numero_carnet":"number","nombre_usuario":"string"}, SP: sp_admin_listar_residente(?,?) '
+  })
+  listarrecolectorfiltrado(
+    @Query() listarAdminResidenteFiltradoDto: ListarAdminResidenteFiltradoDto
+  ){
+    return this.adminResidenteService.listarResidenteFiltrado(listarAdminResidenteFiltradoDto)
   }
 
   @Patch('actualizar/:id_usuario')
