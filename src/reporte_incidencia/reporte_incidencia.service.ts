@@ -81,16 +81,24 @@ export class ReporteIncidenciaService {
 
   async listarIncidencia(listarIncidenciaDto: ListarIncidenciaDto){
     try {
-      const {id_rol, direccion, fecha_reporte, estado} = listarIncidenciaDto;
+      const {id_rol, direccion, fecha_reporte, estado, page, sizePage} = listarIncidenciaDto;
 
       const fechaformateado = fecha_reporte? new Date(fecha_reporte).toISOString().split('T')[0]: null;
 
+      const startIndex = (page - 1) * sizePage;
+
       const [incidencia] = await this.reporteIncidenciaRepository.query(
-        'call sp_admin_listar_reporte_incidencia(?,?,?,?)', 
-        [id_rol, direccion, fechaformateado, estado]
+        'call sp_admin_listar_reporte_incidencia(?,?,?,?,?,?)', 
+        [id_rol, direccion, fechaformateado, estado, startIndex, sizePage]
       );
       
-      return incidencia;
+      const [totalResult] = await this.reporteIncidenciaRepository.query(
+        'call sp_admin_contar_reporte_incidencia(?,?,?,?)', [id_rol, direccion, fechaformateado, estado]
+      );
+
+      const totalIncidencia = totalResult[0].total
+
+      return {totalIncidencia, incidencia};
     } catch (error) {
       throw new BadRequestException('Error al listar', error.message)
     }

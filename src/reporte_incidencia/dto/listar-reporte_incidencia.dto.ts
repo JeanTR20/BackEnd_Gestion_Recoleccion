@@ -1,5 +1,5 @@
 import { Type } from "class-transformer"
-import { IsBoolean, IsDate, IsIn, IsInt, IsNumber, IsNumberString, IsOptional, IsString, Min } from "class-validator"
+import { IsBoolean, IsDate, IsIn, IsInt, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Min } from "class-validator"
 import { NumericType } from "typeorm"
 
 export class ListarIncidenciaDto{
@@ -20,4 +20,17 @@ export class ListarIncidenciaDto{
     @IsNumberString({}, {message: 'La variable estado debe ser de tipo numerico string'})
     @IsIn(['0', '1'], {message: '0 -> estado pendiente, 1 -> estado culminado'})
     estado?: string
+    
+    @IsNumber({}, {message: 'La variable page debe ser de tipo numerico'})
+    @Type(()=> Number)
+    @IsNotEmpty({message: 'La variable page no debe estar vacio'})
+    @Min(1, {message: 'La variable page no debe ser menor a 1'})
+    page: number;
+    
+    @IsNumber({}, {message: 'La variable sizePage debe ser de tipo numerico'})
+    @Type(()=> Number)
+    @IsNotEmpty({message: 'La variable sizePage no debe estar vacio'})
+    @Min(1, {message: 'La variable sizePage no debe ser menor a 1'})
+    sizePage: number;
+
 }
