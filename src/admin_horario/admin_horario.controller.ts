@@ -4,6 +4,7 @@ import { CreateAdminHorarioDto } from './dto/create-admin_horario.dto';
 import { UpdateAdminHorarioDto } from './dto/update-admin_horario.dto';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListAdminHorarioDto } from './dto/list-admin-horario.dto';
+import { ListAdminFilterHorarioDto } from './dto/list-admin-filter-horario.dto';
 
 @ApiTags('Admin-Horario')
 @Controller('admin-horario')
@@ -74,4 +75,19 @@ export class AdminHorarioController {
     return this.adminHorarioService.listarHorario(listAdminHorarioDto)
   }
 
+  @Get('horario-filtro')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  @ApiOperation({
+    summary: 'Listar horario filtrado admin',
+    description:
+      'Esta API permite mostrar una lista el registro de la tabla de horarios de recolección mediante los parametros:{"ruta":"NumberString"(1 -> ruta 1, 2 -> ruta 2), "dia":"string"}. SP: sp_listar_horario(?,?)',
+  })
+  listarhorariofiltrado(
+    @Query() listAdminFilterHorarioDto: ListAdminFilterHorarioDto
+    ){
+    return this.adminHorarioService.listarHorarioFiltrado(listAdminFilterHorarioDto)
+  }
 }

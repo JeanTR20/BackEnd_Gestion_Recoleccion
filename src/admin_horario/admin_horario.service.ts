@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { ListAdminHorarioDto } from './dto/list-admin-horario.dto';
 import { NotificacionService } from 'src/notificacion/notificacion.service';
 import { id } from 'date-fns/locale';
+import { Horario } from 'src/horario/entities/horario.entity';
+import { ListAdminFilterHorarioDto } from './dto/list-admin-filter-horario.dto';
 
 @Injectable()
 export class AdminHorarioService {
@@ -167,6 +169,20 @@ export class AdminHorarioService {
       const totalHorario = totalResult[0].total
 
       return {totalHorario, horario};
+    } catch (error) {
+      throw new BadRequestException('Error, '+ error.message)
+    }
+  }
+
+  async listarHorarioFiltrado(listAdminFilterHorarioDto: ListAdminFilterHorarioDto){
+    try {
+      const {id_ruta, dia, recorrido} = listAdminFilterHorarioDto
+
+      const [horario] = await this.adminHorarioRepository.query(
+        'call sp_admin_listar_horario_filtrado(?,?,?)', [id_ruta, dia, recorrido]
+      );
+
+      return horario;
     } catch (error) {
       throw new BadRequestException('Error, '+ error.message)
     }
