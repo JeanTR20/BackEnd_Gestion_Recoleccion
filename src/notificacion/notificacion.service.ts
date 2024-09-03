@@ -82,7 +82,7 @@ export class NotificacionService {
 
       try {
         const response = await webPush.sendNotification(suscripcion, pushNotificacion)
-        console.log('Notification sent:', response);
+        // console.log('Notification sent:', response);
       } catch (error) {
         // console.error('Error sending push notification', error);
         throw new BadRequestException('Error al enviar la notificacion', error.message)
@@ -148,7 +148,6 @@ export class NotificacionService {
         'call sp_agregar_suscripcion(?,?,?,?)',
         [endpoint, p256dh, auth, id_usuario]
       )
-      console.log('subscripcion agregada')
     } catch (error) {
       throw new BadRequestException('Error al obtener dato de suscripcion, ', error.message)
     }
@@ -163,7 +162,6 @@ export class NotificacionService {
       )
   
       if(!subscriptions.length){
-        console.log("No se encontró ninguna suscripción para el ID de usuario residente o recolector:", userId);
         return []
       }
   
@@ -199,7 +197,6 @@ export class NotificacionService {
       );
 
       if(!suscripciones.length){
-        console.log("No se encontró ninguna suscripción del usuario residente o recolector");
         return []
       }
 
@@ -221,7 +218,6 @@ export class NotificacionService {
     for(const subscription of subscriptions){
       try {
         const response = await webPush.sendNotification(subscription, JSON.stringify(payload));
-        console.log('Notificación enviada: ', response)
       } catch (error) {
         if(error.statusCode === 410){
           await this.deleteSuscripcion(subscription.endpoint)
@@ -238,7 +234,6 @@ export class NotificacionService {
       );
 
       if(!suscripciones.length){
-        console.log("No se encontró ninguna suscripción del usuario residente o recolector");
         return [];
       }
 
