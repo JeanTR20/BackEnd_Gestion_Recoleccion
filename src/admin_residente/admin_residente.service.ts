@@ -68,11 +68,27 @@ export class AdminResidenteService {
   async editarResidente(id_usuario: number, updateAdminResidenteDto: UpdateAdminResidenteDto){
     try {
       const {carnet_identidad, nombre_usuario, telefono, } = updateAdminResidenteDto
-      await this.adminResidenteRepository.query(
+
+      const resultado = await this.adminResidenteRepository.query(
         'call sp_admin_actualizar_residente(?,?,?,?)',
         [id_usuario, telefono, carnet_identidad, nombre_usuario ]
       );
+
+        // Verifica si el procedimiento almacenado envió algún tipo de error o mensaje de validación
+      if (resultado[0][0].message === 'El dni y teléfono ya existe para otro usuario') {
+        throw new BadRequestException('El dni y teléfono ya existe para otro usuario');
+      }
+
+      if (resultado[0][0].message === 'El dni ya existe para otro usuario') {
+        throw new BadRequestException('El dni ya existe para otro usuario');
+      }
+
+      if (resultado[0][0].message === 'El teléfono ya existe para otro usuario') {
+        throw new BadRequestException('El teléfono ya existe para otro usuario');
+      }
+
       return {message: 'Se actualizo exitosamente el usuario residente'}
+
     } catch (error) {
       throw new BadRequestException(error.message)
     }
