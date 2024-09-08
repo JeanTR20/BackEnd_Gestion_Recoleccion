@@ -172,12 +172,12 @@ export class UsuarioService {
         contrasena
       } = updateUsuarioPersonalDto;
 
-      const validarCorreoUsuario = await this.usuarioRespository.query(
-        'SELECT usuario_carnet_identidad, usuario_correo FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_correo = ?',
-        [carnet_identidad, correo]
-      );
+      // const validarCorreoUsuario = await this.usuarioRespository.query(
+      //   'SELECT usuario_carnet_identidad, usuario_correo FROM tbl_usuario WHERE usuario_carnet_identidad = ? OR usuario_correo = ?',
+      //   [carnet_identidad, correo]
+      // );
 
-      await this.usuarioRespository.query(
+      const resultado = await this.usuarioRespository.query(
         'call sp_admin_actualizar_personal(?,?,?,?,?,?,?,?,?,?,?,?)',
         [ 
           id_usuario,
@@ -195,10 +195,27 @@ export class UsuarioService {
         ]
       );
 
+      // Verifica si el procedimiento almacenado envió algún tipo de error o mensaje de validación
+      if (resultado[0][0].message === 'El dni, teléfono y correo ya existe para otro usuario') {
+        throw new BadRequestException('El dni, teléfono y correo ya existe para otro usuario');
+      }
+
+      if (resultado[0][0].message === 'El dni ya existe para otro usuario') {
+        throw new BadRequestException('El dni ya existe para otro usuario');
+      }
+
+      if (resultado[0][0].message === 'El teléfono ya existe para otro usuario') {
+        throw new BadRequestException('El teléfono ya existe para otro usuario');
+      }
+      
+      if (resultado[0][0].message === 'El correo ya existe para otro usuario') {
+        throw new BadRequestException('El correo ya existe para otro usuario');
+      }
+      
       return {message: 'Se actualizo el usuario exitosamente'}
 
     } catch (error) {
-      throw new BadRequestException('Error, ' + error.message)
+      throw new BadRequestException(error.message)
     }
   }
 
