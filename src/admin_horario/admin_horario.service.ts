@@ -41,7 +41,7 @@ export class AdminHorarioService {
         await this.notificacionService.enviarNotificacionToSuscripciones( suscripciones, {
           notification: {
             title: 'Nuevo horario creado de residuos solidos',
-            body: `El nuevo horario creado: RUTA: ${ruta_id}, DIA: ${dia}, HORA DE INICIO: ${formatTime} y RECORRIDO: ${recorrido}.`,
+            body: `RUTA: ${ruta_id}, DIA: ${dia}, HORA DE INICIO: ${formatTime} y RECORRIDO: ${recorrido}.`,
             vibrate: [100, 50, 100],
             icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
             badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
@@ -90,7 +90,7 @@ export class AdminHorarioService {
         await this.notificacionService.enviarNotificacionToSuscripciones( suscripciones, {
           notification: {
             title: 'Actualización de horario de residuos solidos',
-            body: `El horario de la ruta: ${horarioActual.ruta_id} del dia ${horarioActual.horariopunto_dia} fue actualizado. Horario actualizado a: RUTA: ${ruta_id}, DIA: ${dia}, HORA DE INICIO: ${formattedTime} y RECORRIDO: ${recorrido}.`,
+            body: `La Ruta ${horarioActual.ruta_id} del dia ${horarioActual.horariopunto_dia} fue actualizado. HORARIO ACTUALIZADO A RUTA: ${ruta_id}, DIA: ${dia}, HORA DE INICIO: ${formattedTime} y RECORRIDO: ${recorrido}.`,
             vibrate: [100, 50, 100],
             icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
             badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
