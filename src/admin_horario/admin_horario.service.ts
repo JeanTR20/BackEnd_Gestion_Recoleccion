@@ -117,10 +117,7 @@ export class AdminHorarioService {
         [id_horario]
       );
 
-      console.log(horario.horariopunto_hora_inicio)
-
       const formattedTime = horario.horariopunto_hora_inicio.slice(0, 5);
-      console.log(formattedTime)
 
       await this.adminHorarioRepository.query(
         'call sp_admin_eliminar_horario(?)', [id_horario]

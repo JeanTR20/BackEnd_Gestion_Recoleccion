@@ -246,14 +246,14 @@ export class AuthService {
     try {
       const {telefono, codigo_verificacion} = verificarCodigoAuthDto;
 
-      console.log(telefono, codigo_verificacion)
+      // console.log(telefono, codigo_verificacion)
 
       const [result] = await this.authRepository.query(
         'SELECT usuario_verificacion_codigo, usuario_expiracion_codigo FROM tbl_usuario WHERE usuario_telefono = ? AND usuario_verificacion_codigo = ?',
         [telefono, codigo_verificacion]
       )
       
-      console.log(result.usuario_expiracion_codigo)
+      // console.log(result.usuario_expiracion_codigo)
 
       if(result && new Date(result.usuario_expiracion_codigo)> new Date()){
         return {message: 'Código verificado correctamente'}
@@ -269,7 +269,7 @@ export class AuthService {
   async validadarTokenCorreo(token: string){
     try {
       const decoded = await this.jwtService.verifyAsync(token);
-      console.log(decoded)
+      // console.log(decoded)
       return {
         valido: true, 
         correo: decoded.correo
