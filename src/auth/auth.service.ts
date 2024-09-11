@@ -12,6 +12,8 @@ import { EnviarSmsAuthDto } from './dto/enviar-sms-auth.dto';
 import { ConfigService } from '@nestjs/config';
 import * as Twilio from 'twilio';
 import { VerificarCodigoAuthDto } from './dto/verificar-codigo-auth.dto';
+import { Length } from 'class-validator';
+import { Usuario } from '../usuario/entities/usuario.entity';
 
 
 @Injectable()
@@ -96,9 +98,18 @@ export class AuthService {
   }
   
   async obtenerTokenUsuario(token: string): Promise<number>{
+    
+    if (!token) {
+      throw new UnauthorizedException('Token no proporcionado o vacío');
+    }
+
     try {
       const decoded = await this.jwtService.verifyAsync(token);
       const usuario_id  = decoded.id_usuario;
+
+      if (!usuario_id) {
+        throw new UnauthorizedException('Token no contiene ID de usuario');
+      }
       
       return usuario_id;
 
@@ -108,25 +119,47 @@ export class AuthService {
   }
 
   async obtenerDatos(token: string){
-    
-    const idUsuario = await this.obtenerTokenUsuario(token)
-    const [datos] = await this.authRepository.query(
-      'CALL sp_validar_login(?)', [idUsuario]
-      
-    );
-    return {
-      user: {
-        usuario_id: datos[0].usuario_id,
-        usuario_nombre: datos[0].usuario_nombre_usuario,
-        usuario_nombre_completo: datos[0].usuario_nombre_completo,
-        usuario_apellido_paterno: datos[0].usuario_apellido_paterno,
-        usuario_apellido_materno: datos[0].usuario_apellido_materno,
-        usuario_telefono: datos[0].usuario_telefono,
-        usuario_correo: datos[0].usuario_correo,
-        usuario_estado: datos[0].usuario_estado,
-        rol_nombre: datos[0].rol_nombre
-      },
-      token: token
+    try {
+
+      if (!token) {
+        throw new UnauthorizedException('Token no proporcionado');
+      }
+
+      const idUsuario = await this.obtenerTokenUsuario(token)
+
+      // Añadir una verificación para asegurarse de que idUsuario no es undefined
+      if (!idUsuario) {
+        throw new UnauthorizedException('Token no válido o expirado');
+      }
+
+      const [datos] = await this.authRepository.query(
+        'CALL sp_validar_login(?)', [idUsuario]
+        
+      );
+
+      if(!datos || datos.length === 0){
+        throw new Error('No se encontraron datos para el usuario')
+      }
+
+      return {
+        user: {
+          usuario_id: datos[0].usuario_id,
+          usuario_nombre: datos[0].usuario_nombre_usuario,
+          usuario_nombre_completo: datos[0].usuario_nombre_completo,
+          usuario_apellido_paterno: datos[0].usuario_apellido_paterno,
+          usuario_apellido_materno: datos[0].usuario_apellido_materno,
+          usuario_telefono: datos[0].usuario_telefono,
+          usuario_correo: datos[0].usuario_correo,
+          usuario_estado: datos[0].usuario_estado,
+          rol_nombre: datos[0].rol_nombre
+        },
+        token: token
+      }
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;  // Re-lanzar el error de token no válido
+      }
+      throw new Error('Error al obtener datos del usuario');
     }
   }
 
