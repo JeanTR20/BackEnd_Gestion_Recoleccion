@@ -108,8 +108,18 @@ export class NotificacionService {
   }
 
   async obtenerDatoNotificacion(token: string){
+
+    if(!token){
+      throw new BadRequestException('El token no encontrado para esta operación.')
+    }
+
     try {
+
       const id_usuario = await this.authService.obtenerTokenUsuario(token);
+
+      if (!id_usuario) {
+        throw new BadRequestException('No se pudo obtener un ID de usuario válido con el token proporcionado.');
+      }
 
       const [datonotificacion] = await this.notificacionRepository.query(
         'call sp_obtener_programacion_notificacion(?)', [id_usuario]
