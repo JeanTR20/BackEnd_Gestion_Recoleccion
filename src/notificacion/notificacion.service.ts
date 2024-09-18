@@ -69,7 +69,7 @@ export class NotificacionService {
       const pushNotificacion = JSON.stringify({
         notification: {
           title: 'Municipalidad distrital de Huancán',
-          body: `!Hola! El camión de basura pasará hoy a las ${formattedHour}:${formattedMinute}. !No olvides sacar la basura!`,
+          body: `Recuerda sacar la basura. El camión de basura pasará hoy a las ${formattedHour}:${formattedMinute}. !Gracias por tu colaboración!`,
           vibrate: [100, 50, 100],
           icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
           badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
