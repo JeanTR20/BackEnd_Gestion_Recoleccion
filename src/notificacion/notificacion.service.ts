@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Injectable } from '@nestjs/common';
+import { BadRequestException, Body, Injectable, OnModuleInit } from '@nestjs/common';
 import * as webPush from 'web-push';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,7 +8,7 @@ import { CronJob } from 'cron';
 import { Twilio } from 'twilio';
 
 @Injectable()
-export class NotificacionService {
+export class NotificacionService implements OnModuleInit {
 
   private cronJobMap = new Map<number, CronJob>();
 
@@ -33,6 +33,10 @@ export class NotificacionService {
     // )
   }
 
+  async onModuleInit() {
+    await this.reprogramarNotificaciones();
+  }
+
   async programarNotificacion(token: string, suscripcion: any, dia:string, hora: string){
 
     if(!token){
@@ -51,6 +55,13 @@ export class NotificacionService {
       'call sp_registrar_programacion_notificacion(?,?,?)',
       [hora, dia, id_usuario]
     );
+
+    const {endpoint, keys:{p256dh, auth }} = suscripcion
+    
+    await this.notificacionRepository.query(
+      'call sp_agregar_suscripcion(?,?,?,?)',
+      [endpoint, p256dh, auth, id_usuario]
+    )
 
     const [programar] = await this.notificacionRepository.query(
       'call sp_obtener_programacion_notificacion(?)', [id_usuario]
@@ -105,6 +116,68 @@ export class NotificacionService {
       
     };
     return diasemana[dia]
+  }
+
+  async reprogramarNotificaciones() {
+    try {
+
+      const notificaciones = await this.notificacionRepository.query(
+        'SELECT * FROM tbl_programar_notificacion',
+      );
+      
+      const suscripciones = await this.getAllSuscripcionesProgramacionHorario();
+
+      notificaciones.forEach(notificacion => {
+
+        const { programar_hora, programar_dia, usuario_id} = notificacion;
+
+        const suscripcion_usuario = suscripciones.filter(s => s.id_usuario === usuario_id)
+
+        if(!suscripcion_usuario.length){
+          return;
+        }
+
+        const [hour, minute] = programar_hora.split(':').map(num => parseInt(num, 10));
+
+        const formattedHour = hour.toString().padStart(2, '0');
+        const formattedMinute = minute.toString().padStart(2, '0');
+    
+        const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar_dia)}`;
+
+        suscripcion_usuario.forEach(suscripcion_usuario => {
+          const job = new CronJob(crontime, async () => {
+            const pushNotificacion = JSON.stringify({
+              notification: {
+                title: 'Municipalidad distrital de Huancán',
+                body: `Recuerda sacar la basura. El camión de basura pasará hoy a las ${formattedHour}:${formattedMinute}. !Gracias por tu colaboración!`,
+                vibrate: [100, 50, 100],
+                icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
+                badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
+                actions: [{
+                  action: '',
+                  title: 'Cerrar'
+                }]
+              }
+            });
+  
+            try {
+              const response = await webPush.sendNotification(suscripcion_usuario.suscripcion, pushNotificacion)
+              // console.log('Notification sent:', response);
+            } catch (error) {
+              // console.error('Error sending push notification', error);
+              throw new BadRequestException('Error al enviar la notificacion', error.message)
+            }
+  
+          }, null, true, 'America/Lima');
+    
+          this.cronJobMap.set(usuario_id, job);
+          job.start();
+        });
+        
+      });
+    } catch (error) {
+      console.error('Error reprogramando notificaciones:', error);
+    }
   }
 
   async obtenerDatoNotificacion(token: string){
@@ -217,6 +290,34 @@ export class NotificacionService {
           p256dh: suscripcion.suscripcion_p256dh,
           auth: suscripcion.suscripcion_auth
         }
+      }));
+
+    } catch (error) {
+      throw new BadRequestException('Error, ' + error.message)
+    }
+  }
+
+  //esta funcion obtiene todas la suscripciones del residentes y recolectores
+  async getAllSuscripcionesProgramacionHorario(){
+    try {
+      const [suscripciones] = await this.notificacionRepository.query(
+        'call sp_obtener_suscripcion_residente_recolector()'
+      );
+
+      if(!suscripciones.length){
+        return []
+      }
+
+      return suscripciones.map(suscripcion => ({
+        suscripcion: {
+          endpoint: suscripcion.suscripcion_endpoint,
+          expirationTime: null,
+          keys: {
+            p256dh: suscripcion.suscripcion_p256dh,
+            auth: suscripcion.suscripcion_auth
+          }
+        },
+        id_usuario: suscripcion.usuario_id,
       }));
 
     } catch (error) {
