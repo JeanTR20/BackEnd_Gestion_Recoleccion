@@ -49,8 +49,6 @@ export class NotificacionService implements OnModuleInit {
       throw new BadRequestException('Faltan campos requeridos');
     }
 
-    // console.log('suscripcion:', suscripcion);
-
     await this.notificacionRepository.query(
       'call sp_registrar_programacion_notificacion(?,?,?)',
       [hora, dia, id_usuario]
@@ -62,17 +60,15 @@ export class NotificacionService implements OnModuleInit {
       'call sp_agregar_suscripcion(?,?,?,?)',
       [endpoint, p256dh, auth, id_usuario]
     )
-
-    const [programar] = await this.notificacionRepository.query(
-      'call sp_obtener_programacion_notificacion(?)', [id_usuario]
-    );
     
-    const [hour, minute] = programar[0].programar_hora.split(':').map(num => parseInt(num, 10));
+    const [hour, minute] = hora.split(':').map(num => parseInt(num, 10));
+
+    console.log(hour, minute)
 
     const formattedHour = hour.toString().padStart(2, '0');
     const formattedMinute = minute.toString().padStart(2, '0');
 
-    const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar[0].programar_dia)}`;
+    const crontime = `${minute} ${hour} * * ${this.getDiaSemana(dia)}`;
     // console.log(`Scheduling job with crontime: ${crontime}`);
 
     const job = new CronJob(crontime, async () =>{
