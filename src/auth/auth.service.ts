@@ -343,16 +343,30 @@ export class AuthService {
   
   async obtenerDatosById(id_usuario: string){
 
-    const [datos] = await this.authRepository.query(
-      'CALL sp_validar_login(?)', [id_usuario]
-    );
-    return {
-      user: {
-        usuario_id: datos[0].usuario_id,
-        usuario_nombre: datos[0].usuario_nombre_usuario,
-        usuario_correo: datos[0].usuario_correo,
-        usuario_estado: datos[0].usuario_estado,
+    if (!id_usuario) {
+      throw new UnauthorizedException('id_usuario no proporcionado');
+    }
+
+    try {
+      const [datos] = await this.authRepository.query(
+        'CALL sp_validar_login(?)', [id_usuario]
+      );
+
+      
+      if( !datos || !datos[0] || datos.length === 0){
+        throw new Error('No se encontraron datos para el usuario')
       }
+
+      return {
+        user: {
+          usuario_id: datos[0].usuario_id,
+          usuario_nombre: datos[0].usuario_nombre_usuario,
+          usuario_correo: datos[0].usuario_correo,
+          usuario_estado: datos[0].usuario_estado,
+        }
+      }
+    } catch (error) {
+      throw new Error('Error al obtener datos del usuario' + error.message);
     }
   }
 
