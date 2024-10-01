@@ -26,10 +26,10 @@ export class AuthController {
     description:
       'Esta API obtiene los datos del usuario despues del login, mediante los parametros:{"correo": "string", contrasena: "string"}, SP: sp_iniciar_sesion(?,?)',
   })
-  login(
+  async login(
     @Body() loginAuthDto: LoginAuthDto
   ){
-    return this.authService.login(loginAuthDto)
+    return await this.authService.login(loginAuthDto)
   }
   
   @Get('validar-token/:token')
@@ -43,8 +43,8 @@ export class AuthController {
     description:
       'Esta API obtiene los datos del usuario, mediante los parametros:{"token": "string"}, SP: call sp_validar_login(?)',
   })
-  obtenerdatos(@Param('token') token: string) {
-    return this.authService.obtenerDatos(token)
+  async obtenerdatos(@Param('token') token: string) {
+    return await this.authService.obtenerDatos(token)
   }
 
   @Post('register')
@@ -57,10 +57,10 @@ export class AuthController {
     description:
       'Esta API permite crear el usuario del residente, mediante los parametros:{"nombre_usuario": "string", "correo": "string", contrasena: "string"}, SP: sp_registrar_usuario_residente(?,?,?)',
   })
-  crearusuario(
+  async crearusuario(
     @Body() createuserAuthDto: CreateUserAuhtDto
   ){
-    return this.authService.crearUsuario(createuserAuthDto)
+    return await this.authService.crearUsuario(createuserAuthDto)
   }
 
   @Get('validar-token-correo/:token')
@@ -74,8 +74,8 @@ export class AuthController {
     description:
       'Esta API permite validar si el token de correo es valido o expirado',
   })
-  validarCorreo(@Param('token') token: string) {
-    return this.authService.validadarTokenCorreo(token)
+  async validarCorreo(@Param('token') token: string) {
+    return await this.authService.validadarTokenCorreo(token)
   }
 
   @Post('enviar-sms')
@@ -94,10 +94,10 @@ export class AuthController {
     description:
       'Esta API permite recuperar la contraseña del usuario, mediante los parametros:{"telefono": "string"}, SP: call sp_registrar_codigo_verificacion()',
   })
-  enviarsmsrecover(
+  async enviarsmsrecover(
     @Body() enviarSmsAuthDto: EnviarSmsAuthDto
   ){
-    return this.authService.enviarCodigoVerificacion(enviarSmsAuthDto)
+    return await this.authService.enviarCodigoVerificacion(enviarSmsAuthDto)
   }
 
   @Post('verificar-codigo')
@@ -116,10 +116,10 @@ export class AuthController {
     description:
       'Esta API permite verificar el código, mediante los parametros:{"telefono": "string", "codigo: "string"}',
   })
-  verficarcodigo(
+  async verficarcodigo(
     @Body() verificarCodigoAuthDto: VerificarCodigoAuthDto
   ){
-    return this.authService.verificarCodigo(verificarCodigoAuthDto)
+    return await this.authService.verificarCodigo(verificarCodigoAuthDto)
   }
 
   
@@ -133,8 +133,8 @@ export class AuthController {
     description:
       'Esta API permite acualizar la contrasena del usuario, mediante los query:{"token":"string""correo": "string"}',
   })
-  recoverpassword(@Body() recoverAuthDto: RecoverAuthDto){
-    return this.authService.recoverPassword(recoverAuthDto)
+  async recoverpassword(@Body() recoverAuthDto: RecoverAuthDto){
+    return await this.authService.recoverPassword(recoverAuthDto)
   }
 
   @Get()
