@@ -23,9 +23,9 @@ export class ReporteIncidenciaController {
     description:
       'Esta API permite registrar el reporte de incidencia de los residentes, mediante los Query:{"descripcion": "string", "direccion": "string", "referencia_calle": "string", "fecha_reporte": "date", "foto": "string", "token_usuario": "string"}, SP: call sp_registrar_incidencia_reporte(?,?,?,?,?,?)',
   })
-  registrarReporte( 
+  async registrarReporte( 
     @Body() createReporteIncidenciaDto: CreateReporteIncidenciaDto){
-    return this.reporteIncidenciaService.registrarReporteIncidencia(createReporteIncidenciaDto)
+    return await this.reporteIncidenciaService.registrarReporteIncidencia(createReporteIncidenciaDto)
   }
 
   @Get()
@@ -39,10 +39,10 @@ export class ReporteIncidenciaController {
     description:
       'Esta API permite listar y filtrar los reporte de los usuario, mediante los parametros:{"id_rol":"number", direccion": "string", "fecha_reporte": "string", "estado": "string"}, SP: call sp_admin_listar_reporte_incidencia(?,?,?,?)',
   })
-  listarincidencia(
+  async listarincidencia(
     @Query() listarIncidenciaDto: ListarIncidenciaDto
   ){
-    return this.reporteIncidenciaService.listarIncidencia(listarIncidenciaDto)
+    return await this.reporteIncidenciaService.listarIncidencia(listarIncidenciaDto)
   }
 
   @Patch('actualizar-estado/:id_incidencia')
@@ -56,11 +56,11 @@ export class ReporteIncidenciaController {
     description:
       'Esta API permite actualizar un estado de un reporte, mediante los parametros:{"id_incidencia":"number"} y Body: {"estado": "string"}, SP: call sp_admin_actualizar_estado_incidencia(?,?)',
   })
-  updateincidencia(
+  async updateincidencia(
     @Param('id_incidencia') id_incidencia: number,
     @Body() updateReporteIncidenciaDto : UpdateReporteIncidenciaDto
   ){
-    return this.reporteIncidenciaService.actualizarEstado(id_incidencia, updateReporteIncidenciaDto)
+    return await this.reporteIncidenciaService.actualizarEstado(id_incidencia, updateReporteIncidenciaDto)
   }
 
   @Get('listar-mi-reporte')
@@ -74,10 +74,10 @@ export class ReporteIncidenciaController {
     description:
       'Esta API permite listar mi reporte de incidencia de residuos solidos, mediante los parametros:{"id_usuario": "number", "id_rol":"string", "estado": "string"}, SP: call sp_admin_listar_reporte_incidencia(?,?,?,?)',
   })
-  listarmireporte(
+  async listarmireporte(
     @Query() listarMiReporteDto: ListarMiReporteDto
   ){
-    return this.reporteIncidenciaService.listarMiReporte(listarMiReporteDto)
+    return await this.reporteIncidenciaService.listarMiReporte(listarMiReporteDto)
   }
 
   @Delete('eliminar-reporte/:id_reporte')
@@ -91,9 +91,9 @@ export class ReporteIncidenciaController {
     description:
       'Esta API permite eliminar un reporte de incidencia de residuos solidos, mediante los parametros:{"id_usuario": "number"}, SP: call sp_admin_listar_reporte_incidencia(?,?,?,?)',
   })
-  elimniarreporte(
+  async elimniarreporte(
     @Param('id_reporte') id_reporte: number
   ){
-    return this.reporteIncidenciaService.eliminarReporteIncidencia(id_reporte)
+    return await this.reporteIncidenciaService.eliminarReporteIncidencia(id_reporte)
   }
 }
