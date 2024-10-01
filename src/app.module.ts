@@ -6,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HorarioModule } from './horario/horario.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 import { UsuarioModule } from './usuario/usuario.module';
 import { ReporteIncidenciaModule } from './reporte_incidencia/reporte_incidencia.module';
 import { PassportModule } from '@nestjs/passport';
@@ -43,20 +42,20 @@ import { AdminNotificacionModule } from './admin_notificacion/admin_notificacion
       synchronize: false,
     }),
 
-    MailerModule.forRoot({
-      transport: {
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-          user: 'jeantorresricse@gmail.com',
-          pass: 'oxdy dqjc hlxh wnuz'
-        }
-      },
-      defaults: {
-        from: '"Muncipalidad Distrital de Huancán" <jeantorresricse@gmail.com>',
-      },
-    }),
+    // MailerModule.forRoot({
+    //   transport: {
+    //     host: 'smtp.gmail.com',
+    //     port: 587,
+    //     secure: false,
+    //     auth: {
+    //       user: 'jeantorresricse@gmail.com',
+    //       pass: 'oxdy dqjc hlxh wnuz'
+    //     }
+    //   },
+    //   defaults: {
+    //     from: '"Muncipalidad Distrital de Huancán" <jeantorresricse@gmail.com>',
+    //   },
+    // }),
 
     RateLimiterModule,
     

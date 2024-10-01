@@ -7,7 +7,6 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { CreateUserAuhtDto } from './dto/create-user-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { RecoverAuthDto } from './dto/recover-auth.dto';
-import { MailerService } from '@nestjs-modules/mailer';
 import { EnviarSmsAuthDto } from './dto/enviar-sms-auth.dto';
 import { ConfigService } from '@nestjs/config';
 import * as Twilio from 'twilio';
@@ -26,7 +25,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     @InjectRepository(Auth) 
     private readonly authRepository: Repository<Auth>,
-    private readonly mailerService: MailerService,
+    // private readonly mailerService: MailerService,
   ){
     this.twilioClient = Twilio(
       this.configService.get('TWILIO_ACCOUNT_SID'),
