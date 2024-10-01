@@ -17,14 +17,14 @@ export class NotificacionController {
     summary: 'Enviar notificación',
     description: 'Esta API permite envia las notificaciones a los residentes que hayan iniciado sesión, mediante los Parametro: {"token": "number"}, SP:sp_obtener_programacion_notificacion(?)'
   })
-  enviarnotificacion(
+  async enviarnotificacion(
     @Headers('Authorization') headers: string, 
     @Body() body: any
   ){
 
     const token = headers.split(' ')[1];
     const {dia, hora, suscripcion} = body
-    return this.notificacionService.programarNotificacion(token, suscripcion, dia, hora);
+    return await this.notificacionService.programarNotificacion(token, suscripcion, dia, hora);
   } 
 
   @Post('cancelar-notificacion/:id_usuario')
@@ -36,10 +36,10 @@ export class NotificacionController {
     summary: 'Cancelar notificación',
     description: 'Esta API permite cancelar las notificaciones a los residentes que hayan iniciado sesión, mediante los Parametro: {"id_usuario": "number"}'
   })
-  cancelarnotificacion(
+  async cancelarnotificacion(
     @Param('id_usuario') id_usuario: number 
   ){
-    return this.notificacionService.cancelarNotificacion(id_usuario);
+    return await this.notificacionService.cancelarNotificacion(id_usuario);
   }
 
   @Get('obtener-notificacion/:token')
@@ -51,8 +51,8 @@ export class NotificacionController {
     summary: 'obtener datos de notificación',
     description: 'Esta API permite obtener datos de notificación programada de los residentes, mediante los Parametro: {"id_usuario": "number"}'
   })
-  obtenernotificacion(@Param('token') token: string){
-    return this.notificacionService.obtenerDatoNotificacion(token)
+  async obtenernotificacion(@Param('token') token: string){
+    return await this.notificacionService.obtenerDatoNotificacion(token)
   }
 
   @Post('subscribe')
@@ -64,10 +64,10 @@ export class NotificacionController {
     summary: 'obtener suscribe',
     description: 'Esta API recibe la suscripcion enviada desde el cliente para obtener la suscripcion de la aplicacion web'
   })
-  addsuscribe(
+  async addsuscribe(
     @Body() subscription: any
   ){
-    return this.notificacionService.addSuscripcion(subscription);
+    return await this.notificacionService.addSuscripcion(subscription);
   } 
 
 }
