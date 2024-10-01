@@ -22,10 +22,10 @@ export class AdminHorarioController {
     description:
       'Esta API permite crear un nuevo horario de recoleccion de basura, mediante los parametros:{"dia":"string", "hora_inicio":"date", "recorrido":"string", "referencia_punto":"string" , "ruta_id":"string"}. SP: sp_admin_crear_horario(?,?,?,?,?)',
   })
-  crearhorario(
+  async crearhorario(
     @Body() createAdminHorarioDto: CreateAdminHorarioDto
   ){
-    return this.adminHorarioService.crearHorario(createAdminHorarioDto)
+    return await this.adminHorarioService.crearHorario(createAdminHorarioDto)
   }
 
   @Patch('actualizar-horario/:id_horario')
@@ -38,11 +38,11 @@ export class AdminHorarioController {
     description:
       'Esta API permite actualizar un nuevo horario de recoleccion de basura, mediante los parametros:{"id_horario": "number", dia":"string", "hora_inicio":"date", "recorrido":"string", "referencia_punto":"string" , "ruta_id":"string"}. SP: sp_admin_actualizar_horario()',
   })
-  actualizarHorario(
+  async actualizarHorario(
     @Param('id_horario') id_horario: number,
     @Body() updateAdminHorarioDto: UpdateAdminHorarioDto,
   ){
-    return this.adminHorarioService.actualizarHorario(id_horario, updateAdminHorarioDto);
+    return await this.adminHorarioService.actualizarHorario(id_horario, updateAdminHorarioDto);
   }
 
   @Delete('eliminar-horario/:id_horario')
@@ -55,8 +55,8 @@ export class AdminHorarioController {
     description:
       'Esta API permite eliminar un horario de la lista de horarios, mediante los parametros:{"id_horario": "number"}. SP: sp_admin_eliminar_horario()',
   })
-  deletehorario(@Param('id_horario') id_horario: number){
-    return this.adminHorarioService.deleteHorario(id_horario);
+  async deletehorario(@Param('id_horario') id_horario: number){
+    return await this.adminHorarioService.deleteHorario(id_horario);
   }
 
   @Get('')
@@ -69,10 +69,10 @@ export class AdminHorarioController {
     description:
       'Esta API permite mostrar una lista el registro de la tabla de horarios de recolección mediante los parametros:{"ruta":"NumberString"(1 -> ruta 1, 2 -> ruta 2), "dia":"string"}. SP: sp_listar_horario(?,?)',
   })
-  listarhorario(
+  async listarhorario(
     @Query() listAdminHorarioDto: ListAdminHorarioDto
     ){
-    return this.adminHorarioService.listarHorario(listAdminHorarioDto)
+    return await this.adminHorarioService.listarHorario(listAdminHorarioDto)
   }
 
   @Get('horario-filtro')
@@ -85,9 +85,9 @@ export class AdminHorarioController {
     description:
       'Esta API permite mostrar una lista el registro de la tabla de horarios de recolección mediante los parametros:{"ruta":"NumberString"(1 -> ruta 1, 2 -> ruta 2), "dia":"string"}. SP: sp_listar_horario(?,?)',
   })
-  listarhorariofiltrado(
+  async listarhorariofiltrado(
     @Query() listAdminFilterHorarioDto: ListAdminFilterHorarioDto
     ){
-    return this.adminHorarioService.listarHorarioFiltrado(listAdminFilterHorarioDto)
+    return await this.adminHorarioService.listarHorarioFiltrado(listAdminFilterHorarioDto)
   }
 }
