@@ -19,10 +19,10 @@ export class AdminResidenteController {
     summary: 'Listar residente - admin',
     description: 'Esta Api permite listar y filtrar los residentes, mediante el Query:{"numero_carnet":"number","nombre_usuario":"string"}, SP: sp_admin_listar_residente(?,?) '
   })
-  listarrecolector(
+  async listarrecolector(
     @Query() listarAdminResidenteDto: ListarAdminResidenteDto
   ){
-    return this.adminResidenteService.listarResidente(listarAdminResidenteDto)
+    return await this.adminResidenteService.listarResidente(listarAdminResidenteDto)
   }
 
   @Get('residente-filtrado')
@@ -34,10 +34,10 @@ export class AdminResidenteController {
     summary: 'Listar residente filtrado - admin',
     description: 'Esta Api permite listar y filtrar los residentes, mediante el Query:{"numero_carnet":"number","nombre_usuario":"string"}, SP: sp_admin_listar_residente(?,?) '
   })
-  listarrecolectorfiltrado(
+  async listarrecolectorfiltrado(
     @Query() listarAdminResidenteFiltradoDto: ListarAdminResidenteFiltradoDto
   ){
-    return this.adminResidenteService.listarResidenteFiltrado(listarAdminResidenteFiltradoDto)
+    return await this.adminResidenteService.listarResidenteFiltrado(listarAdminResidenteFiltradoDto)
   }
 
   @Patch('actualizar/:id_usuario')
@@ -49,11 +49,11 @@ export class AdminResidenteController {
     summary: 'Actualizar residente - admin',
     description: 'Esta Api permite actualizar los residentes, mediante el Query:{"id_usuario":"number", "telefono":"string", "carnet_identidad":"string","nombre_usuario":"string"}, SP: sp_admin_actualizar_residente(?,?,?,?) '
   })
-  editarresidente(
+  async editarresidente(
     @Param('id_usuario') id_usuario: number,
     @Body() updateAdminResidenteDto: UpdateAdminResidenteDto,
   ){
-    return this.adminResidenteService.editarResidente(id_usuario, updateAdminResidenteDto)
+    return await this.adminResidenteService.editarResidente(id_usuario, updateAdminResidenteDto)
   }
 
   @Delete('eliminar-residente/:id_usuario')
@@ -65,7 +65,7 @@ export class AdminResidenteController {
     summary: 'Eliminar residente - admin',
     description: 'Esta Api permite eliminar la cuenta de los residentes, mediante el Query:{"id_usuario":"number"}, SP: sp_admin_eliminar_residente(?) '
   })
-  eliminarresidente(@Param('id_usuario') id_usuario:number){
-    return this.adminResidenteService.eliminarResidente(id_usuario)
+  async eliminarresidente(@Param('id_usuario') id_usuario:number){
+    return await this.adminResidenteService.eliminarResidente(id_usuario)
   }
 }
