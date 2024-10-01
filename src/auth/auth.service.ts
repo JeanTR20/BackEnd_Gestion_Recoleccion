@@ -119,11 +119,12 @@ export class AuthService {
   }
 
   async obtenerDatos(token: string){
-    try {
 
-      if (!token) {
-        throw new UnauthorizedException('Token no proporcionado');
-      }
+    if (!token) {
+      throw new UnauthorizedException('Token no proporcionado');
+    }
+
+    try {
 
       const idUsuario = await this.obtenerTokenUsuario(token)
 
@@ -137,7 +138,7 @@ export class AuthService {
         
       );
 
-      if(!datos || datos.length === 0){
+      if( !datos || !datos[0] || datos.length === 0){
         throw new Error('No se encontraron datos para el usuario')
       }
 
@@ -159,7 +160,7 @@ export class AuthService {
       if (error instanceof UnauthorizedException) {
         throw error;  // Re-lanzar el error de token no válido
       }
-      throw new Error('Error al obtener datos del usuario');
+      throw new Error('Error al obtener datos del usuario' + error.message);
     }
   }
 
