@@ -19,10 +19,10 @@ export class HorarioController {
     description:
       'Esta API permite mostrar una lista de los horario de recoleccion y las referencia de los puntos de recoleccion mediante los parametros:{"ruta":"NumberString"(1 -> ruta 1, 2 -> ruta 2), "dia":"string"}. SP: sp_listar_horario(?,?)',
   })
-  listarhorario(
+  async listarhorario(
     @Query() dataListarHorarioDto: DataListarHorarioDto
     ){
-    return this.horarioService.listarHorario(dataListarHorarioDto)
+    return await this.horarioService.listarHorario(dataListarHorarioDto)
   }
 
   @Post('anadir-ruta')
@@ -35,10 +35,10 @@ export class HorarioController {
     description:
       'Esta API permite añadir una nueva ruta para los horario de recoleccion, mediante los parametros:{"ruta_nombre":"String", "ruta_descripcion":"string"}. SP: sp_admin_anadir_ruta(?,?)',
   })
-  anadirruta(
+  async anadirruta(
     @Body() dataAnadirRutaDto: DataAnadirRutaDto
   ){
-    return this.horarioService.anadirRuta(dataAnadirRutaDto);
+    return await this.horarioService.anadirRuta(dataAnadirRutaDto);
   }
 
   @Get('listar-ruta')
@@ -51,8 +51,8 @@ export class HorarioController {
     description:
       'Esta API permite listar las rutas del camion recolector, SP: sp_admin_listar_ruta()',
   })
-  listarruta(){
-    return this.horarioService.listarRuta()
+  async listarruta(){
+    return await this.horarioService.listarRuta()
   }
 
   @Delete('eliminar-ruta/:id_ruta')
@@ -65,8 +65,8 @@ export class HorarioController {
     description:
       'Esta API permite eliminar un registro de ruta del camion recolector, SP: sp_admin_eliminar_ruta()',
   })
-  deleteruta(@Param('id_ruta') id_ruta:number ){
-    return this.horarioService.eliminarRuta(id_ruta)
+  async deleteruta(@Param('id_ruta') id_ruta:number ){
+    return await this.horarioService.eliminarRuta(id_ruta)
   }
 
 }
