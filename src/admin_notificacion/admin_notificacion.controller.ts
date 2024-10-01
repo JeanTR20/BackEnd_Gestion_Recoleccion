@@ -17,9 +17,9 @@ export class AdminNotificacionController {
     summary: 'enviar notificacion personalizada',
     description: 'Esta API permite enviar la notificacion personalizada a todos los usuarios residente y recolectores, lo cual es generado por el administrador'
   })
-  enviarnotificacionpersonalizada(
+  async enviarnotificacionpersonalizada(
     @Body() notificacionPersonalizadaDto: NotificacionPersonalizadaDto,
   ){
-    return this.adminNotificacionService.enviarNotificacionPersonalizada(notificacionPersonalizadaDto);
+    return await this.adminNotificacionService.enviarNotificacionPersonalizada(notificacionPersonalizadaDto);
   } 
 }
