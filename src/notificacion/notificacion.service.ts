@@ -63,13 +63,18 @@ export class NotificacionService implements OnModuleInit {
     
     const [hour, minute] = hora.split(':').map(num => parseInt(num, 10));
 
-    console.log(hour, minute)
+    // console.log(hour, minute)
 
     const formattedHour = hour.toString().padStart(2, '0');
     const formattedMinute = minute.toString().padStart(2, '0');
 
     const crontime = `${minute} ${hour} * * ${this.getDiaSemana(dia)}`;
     // console.log(`Scheduling job with crontime: ${crontime}`);
+
+    const existingJobs = this.cronJobMap.get(id_usuario);
+    if(existingJobs){
+      existingJobs.stop();
+    }
 
     const job = new CronJob(crontime, async () =>{
 
@@ -139,6 +144,11 @@ export class NotificacionService implements OnModuleInit {
         const formattedMinute = minute.toString().padStart(2, '0');
     
         const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar_dia)}`;
+
+        const existingJobs = this.cronJobMap.get(usuario_id);
+        if(existingJobs){
+          existingJobs.stop();
+        }
 
         suscripcion_usuario.forEach(suscripcion_usuario => {
           const job = new CronJob(crontime, async () => {
