@@ -23,11 +23,11 @@ export class NotificacionController {
   ){
 
     const token = headers.split(' ')[1];
-    const {dia, hora, suscripcion} = body
-    return await this.notificacionService.programarNotificacion(token, suscripcion, dia, hora);
+    const {dia, hora, tipo_programacion, suscripcion} = body
+    return await this.notificacionService.programarNotificacion(token, suscripcion, dia, hora, tipo_programacion);
   } 
 
-  @Post('cancelar-notificacion/:id_usuario')
+  @Post('cancelar-notificacion')
   @ApiHeader({
     name:'api-key',
     description: 'Contra de API',
@@ -37,9 +37,9 @@ export class NotificacionController {
     description: 'Esta API permite cancelar las notificaciones a los residentes que hayan iniciado sesión, mediante los Parametro: {"id_usuario": "number"}'
   })
   async cancelarnotificacion(
-    @Param('id_usuario') id_usuario: number 
+    @Body() cancelarNotificacionDto: {id_usuario: number, tipo_programacion:number}
   ){
-    return await this.notificacionService.cancelarNotificacion(id_usuario);
+    return await this.notificacionService.cancelarNotificacion(cancelarNotificacionDto.id_usuario, cancelarNotificacionDto.tipo_programacion);
   }
 
   @Get('obtener-notificacion/:token')
@@ -51,7 +51,9 @@ export class NotificacionController {
     summary: 'obtener datos de notificación',
     description: 'Esta API permite obtener datos de notificación programada de los residentes, mediante los Parametro: {"id_usuario": "number"}'
   })
-  async obtenernotificacion(@Param('token') token: string){
+  async obtenernotificacion(
+    @Param('token') token: string
+  ){
     return await this.notificacionService.obtenerDatoNotificacion(token)
   }
 

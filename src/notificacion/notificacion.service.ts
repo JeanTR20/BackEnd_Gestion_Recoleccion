@@ -10,7 +10,7 @@ import { Twilio } from 'twilio';
 @Injectable()
 export class NotificacionService implements OnModuleInit {
 
-  private cronJobMap = new Map<number, CronJob>();
+  private cronJobMap = new Map<string, CronJob>();
 
   // private client: Twilio
 
@@ -37,7 +37,7 @@ export class NotificacionService implements OnModuleInit {
     await this.reprogramarNotificaciones();
   }
 
-  async programarNotificacion(token: string, suscripcion: any, dia:string, hora: string){
+  async programarNotificacion(token: string, suscripcion: any, dia:string, hora: string, tipo_programacion:string){
 
     if(!token){
       throw new BadRequestException('Necesitas iniciar sesión para realizar esta acción backend')
@@ -50,8 +50,8 @@ export class NotificacionService implements OnModuleInit {
     }
 
     await this.notificacionRepository.query(
-      'call sp_registrar_programacion_notificacion(?,?,?)',
-      [hora, dia, id_usuario]
+      'call sp_registrar_o_actualizar_programacion_notificacion(?,?,?,?)',
+      [dia, hora, tipo_programacion, id_usuario]
     );
 
     const {endpoint, keys:{p256dh, auth }} = suscripcion
@@ -63,17 +63,18 @@ export class NotificacionService implements OnModuleInit {
     
     const [hour, minute] = hora.split(':').map(num => parseInt(num, 10));
 
-    // console.log(hour, minute)
-
     const formattedHour = hour.toString().padStart(2, '0');
     const formattedMinute = minute.toString().padStart(2, '0');
 
     const crontime = `${minute} ${hour} * * ${this.getDiaSemana(dia)}`;
     // console.log(`Scheduling job with crontime: ${crontime}`);
 
-    const existingJobs = this.cronJobMap.get(id_usuario);
+    const key = `${id_usuario}-${tipo_programacion}`;
+
+    const existingJobs = this.cronJobMap.get(key);
     if(existingJobs){
       existingJobs.stop();
+      this.cronJobMap.delete(key)
     }
 
     const job = new CronJob(crontime, async () =>{
@@ -101,9 +102,9 @@ export class NotificacionService implements OnModuleInit {
       }
     }, null, true, 'America/Lima');
 
-    this.cronJobMap.set(id_usuario, job);
+    this.cronJobMap.set(key, job);
     job.start();
-  }
+  } 
 
   private getDiaSemana(dia: string): number | undefined{
     const diasemana = {
@@ -120,70 +121,69 @@ export class NotificacionService implements OnModuleInit {
   }
 
   async reprogramarNotificaciones() {
-    try {
-
-      const notificaciones = await this.notificacionRepository.query(
-        'SELECT * FROM tbl_programar_notificacion',
-      );
-      
-      const suscripciones = await this.getAllSuscripcionesProgramacionHorario();
-
-      notificaciones.forEach(notificacion => {
-
-        const { programar_hora, programar_dia, usuario_id} = notificacion;
-
-        const suscripcion_usuario = suscripciones.filter(s => s.id_usuario === usuario_id)
-
-        if(!suscripcion_usuario.length){
-          return;
-        }
-
-        const [hour, minute] = programar_hora.split(':').map(num => parseInt(num, 10));
-
-        const formattedHour = hour.toString().padStart(2, '0');
-        const formattedMinute = minute.toString().padStart(2, '0');
     
-        const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar_dia)}`;
+    const notificaciones = await this.notificacionRepository.query(
+      'SELECT * FROM tbl_programar_notificacion WHERE programar_activo = 1',
+    );
+    
+    const suscripciones = await this.getAllSuscripcionesProgramacionHorario();
 
-        const existingJobs = this.cronJobMap.get(usuario_id);
-        if(existingJobs){
-          existingJobs.stop();
-        }
+    notificaciones.forEach(notificacion => {
 
-        suscripcion_usuario.forEach(suscripcion_usuario => {
-          const job = new CronJob(crontime, async () => {
-            const pushNotificacion = JSON.stringify({
-              notification: {
-                title: 'Municipalidad distrital de Huancán',
-                body: `Recuerda sacar la basura. El camión de basura pasará hoy a las ${formattedHour}:${formattedMinute}. !Gracias por tu colaboración!`,
-                vibrate: [100, 50, 100],
-                icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
-                badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
-                actions: [{
-                  action: '',
-                  title: 'Cerrar'
-                }]
-              }
-            });
+      const { programar_dia, programar_hora, programar_tipo, usuario_id} = notificacion;
+
+      const suscripcion_usuario = suscripciones.filter(s => s.id_usuario === usuario_id)
+
+      if(!suscripcion_usuario.length){
+        return;
+      }
+
+      const key = `${usuario_id}-${programar_tipo}`;
+            
+      const existingJobs = this.cronJobMap.get(key);
+      if(existingJobs){
+        existingJobs.stop();
+        this.cronJobMap.delete(key)
+      }
+
+      const [hour, minute] = programar_hora.split(':').map(num => parseInt(num, 10));
+
+      const formattedHour = hour.toString().padStart(2, '0');
+      const formattedMinute = minute.toString().padStart(2, '0');
   
-            try {
-              const response = await webPush.sendNotification(suscripcion_usuario.suscripcion, pushNotificacion)
-              // console.log('Notification sent:', response);
-            } catch (error) {
-              // console.error('Error sending push notification', error);
-              throw new BadRequestException('Error al enviar la notificacion', error.message)
+      const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar_dia)}`;
+
+      suscripcion_usuario.forEach(suscripcion_usuario => {
+        const job = new CronJob(crontime, async () => {
+          const pushNotificacion = JSON.stringify({
+            notification: {
+              title: 'Municipalidad distrital de Huancán',
+              body: `Recuerda sacar la basura. El camión de basura pasará hoy a las ${formattedHour}:${formattedMinute}. !Gracias por tu colaboración!`,
+              vibrate: [100, 50, 100],
+              icon: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2FIcono.jpeg?alt=media&token=20ee6026-8dac-452a-8bd5-c0530083c58e',
+              badge: 'https://firebasestorage.googleapis.com/v0/b/proyectorecoleccionbasura.appspot.com/o/images%2Ficon-badge.png?alt=media&token=4fbf448a-84cf-47b3-bacb-bbe4b7a2eeba',
+              actions: [{
+                action: '',
+                title: 'Cerrar'
+              }]
             }
+          });
+
+          try {
+            const response = await webPush.sendNotification(suscripcion_usuario.suscripcion, pushNotificacion)
+            // console.log('Notification sent:', response);
+          } catch (error) {
+            // console.error('Error sending push notification', error);
+            throw new BadRequestException('Error al enviar la notificacion', error.message)
+          }
+
+        }, null, true, 'America/Lima');
   
-          }, null, true, 'America/Lima');
-    
-          this.cronJobMap.set(usuario_id, job);
-          job.start();
-        });
-        
+        this.cronJobMap.set(key, job);
+        job.start();
       });
-    } catch (error) {
-      console.error('Error reprogramando notificaciones:', error);
-    }
+      
+    });
   }
 
   async obtenerDatoNotificacion(token: string){
@@ -209,24 +209,31 @@ export class NotificacionService implements OnModuleInit {
     }
   }
 
-  async cancelarNotificacion(id_usuario: number){
+  async cancelarNotificacion(id_usuario: number, tipo_programacion: number){
 
     const [datonotificacion] = await this.notificacionRepository.query(
       'call sp_obtener_programacion_notificacion(?)', [id_usuario]
     );
 
-    await this.notificacionRepository.query(
-      'CALL sp_desactivar_notificacion(?)', [datonotificacion[0].programar_id]
-    )
-    
-    const job = this.cronJobMap.get(id_usuario);
-    if(job) {
-      job.stop();
-      this.cronJobMap.delete(id_usuario);
-      // console.log(`notificacion para el id_usuario ${id_usuario} ha sido cancelado`);
-    }else{
-      // console.log(`no se encontro Cronjob para el usuario ${id_usuario}`)
+    for(const notificacion of datonotificacion){
+
+      if(notificacion.programar_tipo === tipo_programacion){
+
+        await this.notificacionRepository.query(
+          'CALL sp_desactivar_notificacion(?)', [notificacion.programar_id]
+        )
+  
+        const {programar_tipo: tipo_programacion} = notificacion;
+        const key = `${id_usuario}-${tipo_programacion}`
+  
+        const job = this.cronJobMap.get(key);
+        if(job) {
+          job.stop();
+          this.cronJobMap.delete(key);
+        }
+      }
     }
+
   }
 
   async addSuscripcion(subscripcion: any){
