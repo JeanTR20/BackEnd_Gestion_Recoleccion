@@ -6,6 +6,8 @@ import { Notificacion } from './entities/notificacion.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { CronJob } from 'cron';
 import { Twilio } from 'twilio';
+import { url } from 'inspector';
+import { Matches } from 'class-validator';
 
 @Injectable()
 export class NotificacionService implements OnModuleInit {
@@ -89,7 +91,7 @@ export class NotificacionService implements OnModuleInit {
           actions: [{
             action: '',
             title: 'Cerrar'
-          }]
+          }],
         }
       });
 
@@ -153,7 +155,7 @@ export class NotificacionService implements OnModuleInit {
   
       const crontime = `${minute} ${hour} * * ${this.getDiaSemana(programar_dia)}`;
 
-      suscripcion_usuario.forEach(suscripcion_usuario => {
+      const jobs = suscripcion_usuario.map(suscripcion_usuario => {
         const job = new CronJob(crontime, async () => {
           const pushNotificacion = JSON.stringify({
             notification: {
@@ -178,9 +180,14 @@ export class NotificacionService implements OnModuleInit {
           }
 
         }, null, true, 'America/Lima');
-  
+        
         this.cronJobMap.set(key, job);
-        job.start();
+        return job;
+      })
+
+      // Iniciar todos los jobs
+      jobs.forEach(job => {
+        job.start()
       });
       
     });
