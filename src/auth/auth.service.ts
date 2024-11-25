@@ -37,7 +37,7 @@ export class AuthService {
     try {
 
       const [usuario] = await this.authRepository.query(
-        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_carnet_identidad = ? AND usuario_estado = 1',
+        'SELECT usuario_contrasena, usuario_nombre_completo, usuario_apellido_paterno, usuario_apellido_materno, usuario_nombre_usuario, usuario_telefono, usuario_carnet_identidad, usuario_correo, usuario_id, usuario_estado FROM tbl_usuario WHERE usuario_carnet_identidad = ? AND usuario_estado = 1',
         [dni_usuario]
       );
 
@@ -72,6 +72,7 @@ export class AuthService {
             usuario_apellido_materno: usuario.usuario_apellido_materno,
             usuario_nombre: usuario.usuario_nombre_usuario,
             usuario_telefono: usuario.usuario_telefono,
+            usuario_carnet_identidad: usuario.usuario_carnet_identidad,
             usuario_correo: usuario.usuario_correo,
             usuario_estado: usuario.usuario_estado,
             rol_nombre: user[0].rol_nombre
@@ -149,6 +150,7 @@ export class AuthService {
           usuario_apellido_paterno: datos[0].usuario_apellido_paterno,
           usuario_apellido_materno: datos[0].usuario_apellido_materno,
           usuario_telefono: datos[0].usuario_telefono,
+          usuario_carnet_identidad: datos[0].usuario_carnet_identidad,
           usuario_correo: datos[0].usuario_correo,
           usuario_estado: datos[0].usuario_estado,
           rol_nombre: datos[0].rol_nombre
