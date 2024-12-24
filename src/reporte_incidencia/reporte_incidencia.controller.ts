@@ -6,6 +6,7 @@ import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListarIncidenciaDto } from './dto/listar-reporte_incidencia.dto';
 import { ListAdminHorarioDto } from 'src/admin_horario/dto/list-admin-horario.dto';
 import { ListarMiReporteDto } from './dto/listar-mi-reporte.dto';
+import { ListarMiReporteByPaginacionDto } from './dto/listar-mi-reporte-by-paginacion.dto';
 
 @ApiTags('Reporte-incidencia')
 @Controller('reporte-incidencia')
@@ -78,6 +79,23 @@ export class ReporteIncidenciaController {
     @Query() listarMiReporteDto: ListarMiReporteDto
   ){
     return await this.reporteIncidenciaService.listarMiReporte(listarMiReporteDto)
+  }
+
+  @Get('listar-mi-reporte-paginacion')
+  @ApiHeader({
+    name: 'api-key',
+    description: 'Contra de API',
+  })
+  
+  @ApiOperation({
+    summary: 'Listar mi reporte por paginacion',
+    description:
+      'Esta API permite listar mi reporte de incidencia de residuos solidos, mediante los parametros:{"id_usuario": "number", "id_rol":"string", "estado": "string"}, SP: call sp_admin_listar_reporte_incidencia(?,?,?,?)',
+  })
+  async listarmireportebypaginacion(
+    @Query() listarMiReporteByPaginacionDto: ListarMiReporteByPaginacionDto
+  ){
+    return await this.reporteIncidenciaService.listarMiReportebyPaginacion(listarMiReporteByPaginacionDto)
   }
 
   @Delete('eliminar-reporte/:id_reporte')

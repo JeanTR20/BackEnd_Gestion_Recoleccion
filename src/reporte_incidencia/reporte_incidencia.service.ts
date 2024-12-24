@@ -10,6 +10,7 @@ import { ListarMiReporteDto } from './dto/listar-mi-reporte.dto';
 import { NotificacionService } from 'src/notificacion/notificacion.service';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { ListarMiReporteByPaginacionDto } from './dto/listar-mi-reporte-by-paginacion.dto';
 
 @Injectable()
 export class ReporteIncidenciaService {
@@ -159,6 +160,32 @@ export class ReporteIncidenciaService {
         [id_usuario, estado]
       );
       return reporte;
+
+    } catch (error) {
+      throw new BadRequestException('Error al listar mi reporte, ' + error.message)
+    }
+  }
+
+  async listarMiReportebyPaginacion(listarMiReporteByPaginacionDto: ListarMiReporteByPaginacionDto){
+    try {
+      const {token_usuario, estado, page, sizePage} = listarMiReporteByPaginacionDto;
+  
+      const id_usuario = await this.authService.obtenerTokenUsuario(token_usuario)
+
+      const startIndex = (page - 1) * sizePage;
+
+      const [reporte] = await this.reporteIncidenciaRepository.query(
+        'call sp_listar_mi_reporte_incidencia_by_paginacion(?,?,?,?)', 
+        [id_usuario, estado, startIndex, sizePage]
+      );
+
+      const [totalResult] = await this.reporteIncidenciaRepository.query(
+        'call sp_contar_reporte_incidencia_paginacion(?,?)',
+        [id_usuario, estado]
+      );
+
+      const totalReporte = totalResult[0].total
+      return {totalReporte, reporte};
 
     } catch (error) {
       throw new BadRequestException('Error al listar mi reporte, ' + error.message)
